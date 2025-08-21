@@ -1,9 +1,9 @@
-# Vibe Remote 🚀
+# Vibe 🤮 Remote 🚀
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/jjdenhertog/viberemote)](https://hub.docker.com/r/jjdenhertog/viberemote)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Remote AI development environment with Vibe-Kanban task management and Claude AI integration. Deploy isolated workstations per-project via Portainer.
+Remote AI development environment with Vibe-Kanban task management and Claude AI integration. 
 
 ## ✨ What's Included
 
@@ -111,21 +111,6 @@ volumes:
   data:
 ```
 
-### Quick Deploy Instructions
-
-**For Docker Compose:**
-```bash
-# Save configuration as docker-compose.yml
-# Edit passwords and settings
-docker-compose up -d
-```
-
-**For Portainer:**
-1. Go to Stacks → Add stack
-2. Paste the YAML configuration
-3. Edit environment variables directly in the web editor
-4. Deploy the stack
-
 ### Access Your Environment
 
 - SSH: `ssh developer@localhost -p 9090`
@@ -222,10 +207,15 @@ npx -y claude-flow@alpha init --force
 - The `init-project` command automatically updates `.gitignore` to exclude Claude-Flow files from your repository
 - Claude Code interactions are not visible in the Vibe-Kanban UI interface
 
+## 🔒 Enhanced Security with Firewall
+
+The Vibe 🤮 coding approach runs Claude Code with `--dangerously-skip-permissions` for maximum flexibility. While running in a separate Docker container provides good isolation, you can add an extra layer of security by implementing a firewall using a Squid proxy.
+
+This setup creates a whitelist-based network filter that only allows connections to approved domains, preventing potential unwanted network access. See [FIREWALL.md](FIREWALL.md) for detailed setup instructions on implementing a Squid proxy firewall for your Vibe 🤮 Remote workstation.
+
 ## 🖥️ VS Code / Cursor Remote Development
 
 1. Install the "Remote - SSH" extension
-
 2. Connect: Cmd/Ctrl + Shift + P → "Remote-SSH: Connect to Host"
 3. First time only, choose `+ Add new SSH Host`:
 
