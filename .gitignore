@@ -1,0 +1,8 @@
+.env
+.env.local
+*.log
+node_modules/
+.DS_Store
+*.tar
+*.tar.gz
+.claude
