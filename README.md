@@ -127,6 +127,9 @@ ssh developer@localhost -p 9090
 claude login              # Claude Code auth
 gh auth login            # GitHub CLI auth
 
+# 2.b Add vibe-kanban MCP (optional)
+claude mcp add vibe_kanban -- npx -y vibe-kanban --mcp
+
 # 3. Configure Git
 git config --global user.name "Your Name"
 git config --global user.email "your@email.com"
