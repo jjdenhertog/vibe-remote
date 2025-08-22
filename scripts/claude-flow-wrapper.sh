@@ -29,7 +29,13 @@ if [[ -n "$PROMPT" ]]; then
     # Always use a temporary file to avoid E2BIG errors
     PROMPT_FILE=$(mktemp /tmp/claude-flow-prompt.XXXXXX)
     echo "$PROMPT" > "$PROMPT_FILE"
-    # Pass a prompt telling claude-flow to read from the file
-    npx -y claude-flow@alpha $MODE "Read your objective here: $PROMPT_FILE" $FLAGS
+    
+    # Call differently based on MODE
+    if [[ "$MODE" == "hive" ]]; then
+        npx -y claude-flow@alpha hive-mind spawn "Read your objective here: $PROMPT_FILE" $FLAGS
+    else
+        npx -y claude-flow@alpha swarm "Read your objective here: $PROMPT_FILE" $FLAGS
+    fi
+    
     rm -f "$PROMPT_FILE"
 fi

@@ -59,7 +59,8 @@ RUN mkdir -p /home/developer/.npm-global /home/developer/.npm \
 # Install vibe-kanban as developer user in their npm-global directory
 USER developer
 RUN npm install -g \
-    @anthropic-ai/claude-code@latest
+    @anthropic-ai/claude-code@latest \
+    pnpm
 USER root
 
 # Configure SSH

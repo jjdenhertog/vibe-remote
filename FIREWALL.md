@@ -39,21 +39,21 @@ networks:
 Create `whitelist.txt` with approved domains:
 
 ```
+.anthropic.com
+.statsig.com
+.sentry.io
+.brave.com
+api.search.brave.com
 .github.com
 .githubusercontent.com
 .npmjs.org
-.pypi.org
-.pythonhosted.org
-.anthropic.com
-.docker.io
-.docker.com
-.sentry.io
-.statsig.com
-.openai.com
-.huggingface.co
-.cdn.jsdelivr.net
-.cdnjs.cloudflare.com
-.unpkg.com
+registry.npmjs.org
+.nodejs.org
+.typescriptlang.org
+.nextjs.org
+.vercel.com
+.react.dev
+developer.mozilla.org
 ```
 
 ### Configure Squid
