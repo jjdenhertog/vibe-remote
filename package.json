@@ -1,6 +1,6 @@
 {
   "name": "vibe-remote",
-  "version": "7.0.40",
+  "version": "7.0.41",
   "description": "Remote AI development environment with Vibe-Kanban task management and Claude AI integration",
   "main": "index.js",
   "scripts": {
@@ -9,9 +9,9 @@
     "docker:push": "PACKAGE_VERSION=$(grep '\"version\"' package.json | cut -d '\"' -f 4 | head -n 1) && docker buildx build --platform=linux/amd64,linux/arm64 -t jjdenhertog/viberemote:latest -t jjdenhertog/viberemote:$PACKAGE_VERSION --push .",
     "docker:run": "docker run -d -p 2222:22 -p 3000:3000 -p 8443:8443 -e DEVELOPER_PASSWORD=changeme jjdenhertog/viberemote:latest",
     "docker:stop": "docker stop $(docker ps -q --filter ancestor=jjdenhertog/viberemote)",
-    "version:patch": "npm version patch",
-    "version:minor": "npm version minor",
-    "version:major": "npm version major",
+    "version:patch": "npm version patch --force",
+    "version:minor": "npm version minor --force",
+    "version:major": "npm version major --force",
     "release": "npm run docker:push && git push && git push --tags"
   },
   "keywords": [
