@@ -1,6 +1,6 @@
 {
   "name": "vibe-remote",
-  "version": "7.0.50",
+  "version": "7.0.51",
   "description": "Remote AI development environment with Vibe-Kanban task management and Claude AI integration",
   "main": "index.js",
   "scripts": {
