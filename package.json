@@ -5,7 +5,7 @@
     "apps/*",
     "packages/*"
   ],
-  "version": "7.0.66",
+  "version": "7.0.67",
   "description": "Remote AI development environment with Vibe-Kanban task management and Claude AI integration",
   "main": "index.js",
   "scripts": {
@@ -19,7 +19,8 @@
     "type-check:watch": "tsc --build --watch --noEmit",
     "watch:packages": "tsc --build packages/* --watch",
     "test:packages": "pnpm run test --filter=\"./packages/*\" --if-present",
-    "dev:web": "pnpm run dev --filter=@vibe-remote/web",
+    "dev": "pnpm --filter=@vibe-remote/web dev",
+    "dev:web": "pnpm --filter=@vibe-remote/web dev",
     "lint": "pnpm -r --if-present run lint",
     "lint:fix": "pnpm -r --if-present run lint:fix",
     "docker:build": "pnpm run build && docker build -t jjdenhertog/viberemote .",
