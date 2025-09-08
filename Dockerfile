@@ -1,4 +1,5 @@
-FROM ubuntu:22.04
+# Build stage
+FROM ubuntu:22.04 AS builder
 
 LABEL maintainer="Vibe Remote Contributors"
 LABEL version="7.0.0"
@@ -9,16 +10,54 @@ ENV DEBIAN_FRONTEND=noninteractive \
     LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
     NODE_VERSION=20 \
-    CLAUDE_CODE_ENABLE_TELEMETRY=0 \
-    HOME=/home/developer
+    NODE_ENV=production
 
-# Install base packages
+# Install build dependencies only
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl wget git ca-certificates gnupg \
+    build-essential python3 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js 20 LTS
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install pnpm globally
+RUN npm install -g pnpm@10.15.0
+
+# Copy monorepo files and build
+WORKDIR /build
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml* ./
+COPY packages/ ./packages/
+COPY apps/ ./apps/
+COPY config/ ./config/
+COPY tsconfig.json eslint.config.mjs ./
+
+# Install dependencies and build
+RUN pnpm install --frozen-lockfile && \
+    pnpm run build && \
+    cd apps/web && \
+    pnpm run build
+
+# ===== PRODUCTION STAGE =====
+FROM ubuntu:22.04 AS production
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    TZ=UTC \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
+    NODE_VERSION=20 \
+    CLAUDE_CODE_ENABLE_TELEMETRY=0 \
+    HOME=/home/developer \
+    NODE_ENV=production
+
+# Install production runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl wget git vim nano htop jq ca-certificates gnupg lsb-release \
-    build-essential python3 python3-pip python3-venv \
     openssh-server net-tools iputils-ping tree \
     supervisor tmux screen libatomic1 sudo \
-    sqlite3 libsqlite3-dev unzip \
+    sqlite3 libsqlite3-dev unzip expect \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js 20 LTS
@@ -56,11 +95,12 @@ RUN mkdir -p /home/developer/.npm-global /home/developer/.npm \
     && su - developer -c "npm config set prefix '/home/developer/.npm-global'" \
     && echo 'export PATH=/home/developer/.npm-global/bin:$PATH' >> /home/developer/.bashrc
 
-# Install vibe-kanban as developer user in their npm-global directory
+# Install global packages as developer user
 USER developer
 RUN npm install -g \
     @anthropic-ai/claude-code@latest \
-    pnpm
+    pnpm@10.15.0 \
+    typescript@^5.0.0
 USER root
 
 # Configure SSH
@@ -70,10 +110,20 @@ RUN mkdir /var/run/sshd \
     && echo "AllowUsers developer" >> /etc/ssh/sshd_config
 
 # Create directories
-RUN mkdir -p /workspace/credentials /workspace/project /workspace/data \
+RUN mkdir -p /workspace/credentials /workspace/project /workspace/data /workspace/vibe-web \
     /scripts /var/log/supervisor \
     /home/developer/.config \
     && chown -R developer:developer /workspace /home/developer
+
+# Copy built artifacts from build stage
+COPY --from=builder /build/packages/claude-wrapper/dist/ /scripts/claude-flow-wrapper-dist/
+COPY --from=builder /build/packages/vibe-kanban-cleanup/dist/ /scripts/vibe-kanban-cleanup-dist/
+# Copy Next.js standalone app (root includes the full monorepo structure)  
+COPY --from=builder /build/apps/web/.next/standalone/ /workspace/vibe-web/
+# Copy static files relative to server.js location
+COPY --from=builder /build/apps/web/.next/static/ /workspace/vibe-web/apps/web/.next/static/
+# Copy public files relative to server.js location  
+COPY --from=builder /build/apps/web/public/ /workspace/vibe-web/apps/web/public/
 
 # Copy configuration files
 COPY --chown=root:root supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
@@ -81,16 +131,18 @@ COPY --chown=root:root scripts/ /scripts/
 COPY --chown=root:root docker-entrypoint.sh /docker-entrypoint.sh
 
 # Make scripts executable and create symlinks for user commands
-RUN chmod +x /docker-entrypoint.sh /scripts/*.sh && \
+RUN chmod +x /docker-entrypoint.sh /scripts/*.sh /scripts/claude-flow-wrapper-dist/*.js /scripts/vibe-kanban-cleanup-dist/*.js && \
     ln -s /scripts/init-project.sh /usr/local/bin/init-project && \
-    ln -s /scripts/claude-flow-wrapper.sh /usr/local/bin/claude-flow-wrapper && \
+    ln -s /scripts/claude-flow-wrapper-dist/claude-flow-wrapper.js /usr/local/bin/claude-flow-wrapper && \
+    ln -s /scripts/vibe-kanban-cleanup-dist/vibe-kanban-cleanup.js /usr/local/bin/vibe-kanban-cleanup && \
     ln -s /scripts/setup-verify.sh /usr/local/bin/setup-verify && \
     ln -s /scripts/setup-storage-credentials.sh /usr/local/bin/setup-storage-credentials && \
-    ln -s /scripts/setup-storage-data.sh /usr/local/bin/setup-storage-data
+    ln -s /scripts/setup-storage-data.sh /usr/local/bin/setup-storage-data && \
+    chown -R developer:developer /workspace/project /workspace/vibe-web
 
 # Expose ports - designed to be remapped with PORT_PREFIX
-# SSH (9090), Vibe-Kanban (9091), Development servers (3000-3010)
-EXPOSE 9090 9091 3000-3010
+# SSH (9090), Vibe-Kanban (9091), Vibe-Remote-Web (8080), Development servers (3000-3010)
+EXPOSE 9090 9091 8080 3000-3010
 
 WORKDIR /workspace
 

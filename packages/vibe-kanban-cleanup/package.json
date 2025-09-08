@@ -1,0 +1,41 @@
+{
+  "name": "@vibe-remote/vibe-kanban-cleanup",
+  "version": "7.0.57",
+  "description": "Cleanup script for automated PR creation and git operations",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/vibe-kanban-cleanup.js",
+      "types": "./dist/vibe-kanban-cleanup.d.ts"
+    }
+  },
+  "bin": {
+    "vibe-kanban-cleanup": "./dist/vibe-kanban-cleanup.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "clean": "rm -rf dist",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "vibe-kanban",
+    "cleanup",
+    "pr",
+    "git",
+    "automation",
+    "cli",
+    "typescript"
+  ],
+  "peerDependencies": {
+    "typescript": ">=5.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

@@ -57,7 +57,7 @@ services:
       # CHANGE THESE: Use unique ports for each project
       - "9090:9090"       # SSH
       - "9091:9091"       # Vibe-Kanban
-      - "9092:3000"       # Example dev server
+      - "9092:8080"       # Vibe-Remote Web App
       
     volumes:
       # Persistent storage split into three volumes
@@ -98,7 +98,7 @@ services:
     ports:
       - "9090:9090"     # SSH
       - "9091:9091"     # Vibe-Kanban
-      - "9092:3000"     # Example Dev server
+      - "9092:8080"     # Vibe-Remote Web App
     
     volumes:
       - credentials:/workspace/credentials
@@ -115,7 +115,7 @@ volumes:
 
 - SSH: `ssh developer@localhost -p 9090`
 - Vibe-Kanban: `http://localhost:9091`  
-- Dev server: `http://localhost:9092`
+- Vibe-Remote Web App: `http://localhost:9092`
 
 ### First Time Setup
 
@@ -246,7 +246,7 @@ To run multiple projects, adjust the ports and container names in your docker-co
 |---------|-----------|-----------|-----------|
 | SSH | 9090 | 8090 | 7090 |
 | Vibe-Kanban | 9091 | 8091 | 7091 |
-| Dev Server | 9092 | 8092 | 7092 |
+| Vibe-Remote Web App | 9092 | 8092 | 7092 |
 
 Also update:
 - Container name: `vibe-remote-project1`, `vibe-remote-project2`, etc.

@@ -1,8 +1,49 @@
+# Environment files
 .env
 .env.local
-*.log
+.env.*
+
+# Dependencies
 node_modules/
+.pnp
+.pnp.*
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# TypeScript compilation outputs
+dist/
+build/
+lib/
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# Testing
+coverage/
+.nyc_output/
+
+# OS generated files
 .DS_Store
+.DS_Store?
+._*
+Thumbs.db
+
+# Archives
 *.tar
 *.tar.gz
+
+# IDE and editor files
+.vscode/settings.json
+.idea/
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+
+# Claude
 .claude

@@ -1,0 +1,39 @@
+{
+  "name": "@vibe-remote/claude-wrapper",
+  "version": "7.0.57",
+  "description": "TypeScript wrapper for Claude flow automation",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/claude-flow-wrapper.js",
+      "types": "./dist/claude-flow-wrapper.d.ts"
+    }
+  },
+  "bin": {
+    "claude-flow-wrapper": "./dist/claude-flow-wrapper.js"
+  },
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "scripts": {
+    "build": "tsc && cp -r templates dist/",
+    "build:watch": "tsc --watch",
+    "clean": "rm -rf dist",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "claude",
+    "automation",
+    "cli",
+    "typescript"
+  ],
+  "peerDependencies": {
+    "typescript": ">=5.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

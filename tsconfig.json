@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "files": [],
+  "references": [
+    {
+      "path": "./packages/claude-wrapper"
+    },
+    {
+      "path": "./packages/vibe-kanban-cleanup"
+    },
+    {
+      "path": "./apps/web"
+    }
+  ]
+}
