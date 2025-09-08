@@ -12,18 +12,21 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
+    "@monaco-editor/react": "^4.7.0",
+    "@vibe-remote/claude-wrapper": "workspace:*",
+    "lucide-react": "^0.542.0",
+    "monaco-editor": "^0.52.2",
     "next": "15.5.2",
-    "@vibe-remote/claude-wrapper": "workspace:*"
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4"
+    "tailwindcss": "^4",
+    "typescript": "^5"
   },
   "engines": {
     "node": ">=18"
