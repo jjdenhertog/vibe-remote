@@ -1,0 +1,25 @@
+# Supervisord configuration example for vibe-kanban-taskpicker
+# Copy this file to your supervisord configuration directory and adjust paths
+
+[program:vibe-taskpicker]
+command=node /app/packages/vibe-kanban-taskpicker/dist/index.js
+directory=/app
+autostart=true
+autorestart=true
+startretries=3
+stderr_logfile=/var/log/supervisor/vibe-taskpicker.err.log
+stdout_logfile=/var/log/supervisor/vibe-taskpicker.out.log
+environment=
+    NODE_ENV="production",
+    CLAUDE_COMMAND="claude",
+    VIBE_API_URL="http://localhost:3001",
+    TASK_CHECK_INTERVAL="300"
+user=app
+priority=999
+
+# Run every 5 minutes (300 seconds)
+# The process will exit after completing one task, and supervisord will restart it
+startsecs=1
+exitcodes=0
+stopsignal=TERM
+stopwaitsecs=10
