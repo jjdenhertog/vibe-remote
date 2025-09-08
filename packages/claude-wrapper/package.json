@@ -1,6 +1,6 @@
 {
   "name": "@vibe-remote/claude-wrapper",
-  "version": "7.0.57",
+  "version": "7.0.58",
   "description": "TypeScript wrapper for Claude flow automation",
   "type": "module",
   "exports": {

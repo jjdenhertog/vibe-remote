@@ -4,6 +4,7 @@ import { VibeKanbanContext } from './types/VibeKanbanContext.js';
 import { validateEnvironment } from './functions/validateEnvironment.js';
 import { fetchVibeKanbanContext } from './functions/fetchVibeKanbanContext.js';
 import { createPullRequest } from './functions/createPullRequest.js';
+import { readAutomationPreferences } from './functions/readAutomationPreferences.js';
 
 class VibeKanbanCleanup {
     // private readonly prBodyFile = 'pr_body.md';
@@ -19,9 +20,15 @@ class VibeKanbanCleanup {
 
             console.error(`Task: "${this.vibeContext.task.title}"`);
 
-            const prUrl = await createPullRequest(this.vibeContext);
-
-            console.error(`\n✅ PR created: ${prUrl}`);
+            // Read automation preferences
+            const preferences = readAutomationPreferences();
+            
+            if (preferences.automaticallyCreatePR) {
+                const prUrl = await createPullRequest(this.vibeContext);
+                console.error(`\n✅ PR created: ${prUrl}`);
+            } else {
+                console.error('\n⏸️ PR creation skipped (automaticallyCreatePR is disabled in preferences)');
+            }
 
         } catch (error) {
             console.error('❌ Cleanup failed:', error);

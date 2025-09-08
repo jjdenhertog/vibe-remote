@@ -3,7 +3,7 @@ import { spawn } from 'node:child_process';
 export function runClaudeCommand(promptFile: string): Promise<void> {
     return new Promise((resolve, reject) => {
         const claude = spawn('claude', [
-            '-p', `Read your objective here: ${promptFile}`,
+            '-p', `Read and execute the this file ${promptFile}`,
             '--dangerously-skip-permissions',
             '--verbose',
             '--output-format=stream-json'
