@@ -3,29 +3,20 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { existsSync } from 'node:fs';
 
-const PREFERENCES_DIR = join(process.cwd(), '../../data/preferences');
+const PREFERENCES_DIR = '/workspace/data/preferences';
 const PR_PROMPT_FILE = join(PREFERENCES_DIR, 'pr-prompt.md');
 
-const DEFAULT_PR_PROMPT = `# PR Review and Analysis Prompt
-
-## Task Assessment Instruction
-
-In the current directory, recent changes have been made to perform **%TASK%**. 
+const DEFAULT_PR_PROMPT = `Your goal is to code review the current project before a PR is being created.
 
 ## Analysis Requirements
-
 1. **Assess the codebase thoroughly**
 2. **Analyze everything file by file** 
 3. **Determine how well the task was executed**
 
 ## Review Criteria
-
 - Code quality and adherence to standards
-- Completeness of implementation
-- Error handling and edge cases
-- Test coverage and documentation
-- Performance considerations
-- Security best practices
+- No over engineering
+- Everything in the task should be implemented
 
 ## Action Items
 
@@ -35,19 +26,6 @@ If the task was not executed well, you should:
 - **Improve code quality** where needed
 - **Add missing functionality** to complete the task
 - **Enhance error handling** and validation
-- **Update documentation** as required
-
-## Output Format
-
-Provide a comprehensive analysis including:
-- Summary of changes made
-- Quality assessment score (1-10)
-- List of issues found and fixed
-- Recommendations for future improvements
-
----
-
-*This prompt will be used by AI assistants when reviewing PRs and assessing code quality. Customize it to match your specific review requirements and standards.*
 `;
 
 export async function GET() {

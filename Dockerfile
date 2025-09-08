@@ -117,6 +117,8 @@ RUN mkdir -p /workspace/credentials /workspace/project /workspace/data /workspac
 
 # Copy built artifacts from build stage
 COPY --from=builder /build/packages/claude-wrapper/dist/ /scripts/claude-flow-wrapper-dist/
+COPY --from=builder /build/packages/claude-wrapper/templates/ /scripts/claude-flow-wrapper-dist/templates/
+
 COPY --from=builder /build/packages/vibe-kanban-cleanup/dist/ /scripts/vibe-kanban-cleanup-dist/
 # Copy Next.js standalone app (root includes the full monorepo structure)  
 COPY --from=builder /build/apps/web/.next/standalone/ /workspace/vibe-web/
