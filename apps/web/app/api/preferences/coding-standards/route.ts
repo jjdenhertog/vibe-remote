@@ -3,7 +3,7 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { existsSync } from 'node:fs';
 
-const PREFERENCES_DIR = join(process.cwd(), '../../data/preferences');
+const PREFERENCES_DIR = '/workspace/data/preferences';
 const CODING_STANDARDS_FILE = join(PREFERENCES_DIR, 'coding-standards.md');
 
 const DEFAULT_CODING_STANDARDS = `# Coding Standards
@@ -32,11 +32,6 @@ const DEFAULT_CODING_STANDARDS = `# Coding Standards
 - Group related files together
 - Use descriptive file names
 - Maintain consistent directory structure
-
-## Testing
-- Write unit tests for critical functionality
-- Follow testing best practices
-- Maintain good test coverage
 `;
 
 export async function GET() {

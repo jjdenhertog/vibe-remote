@@ -6,8 +6,8 @@ export async function createPullRequest(vibeContext: VibeKanbanContext): Promise
         const pullRequestUrl = `${vibeContext.apiBaseUrl}/api/task-attempts/${vibeContext.taskAttempt.id}/pr`;
 
         const requestBody = {
-            title: vibeContext.task.title,
-            body: `${vibeContext.task.description}\\n\\n---\\n\\n🤖 Automated PR created by vibe-kanban\\n\\nAttempt ID: ${vibeContext.taskAttempt.id}`,
+            title: 'test',
+            body: vibeContext.task.description,
             base_branch: vibeContext.taskAttempt.base_branch
         };
 

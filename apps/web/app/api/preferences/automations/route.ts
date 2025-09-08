@@ -3,7 +3,7 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { existsSync } from 'node:fs';
 
-const PREFERENCES_DIR = join(process.cwd(), '../../data/preferences');
+const PREFERENCES_DIR = '/workspace/data/preferences';
 const AUTOMATIONS_FILE = join(PREFERENCES_DIR, 'automations.json');
 
 const DEFAULT_AUTOMATIONS = {
