@@ -5,7 +5,7 @@
     "apps/*",
     "packages/*"
   ],
-  "version": "7.0.78",
+  "version": "7.0.79",
   "description": "Remote AI development environment with Vibe-Kanban task management and Claude AI integration",
   "main": "index.js",
   "scripts": {
@@ -29,9 +29,9 @@
     "docker:push:no-cache": "pnpm run build:clean && pnpm run build && PACKAGE_VERSION=$(grep '\"version\"' package.json | cut -d '\"' -f 4 | head -n 1) && docker buildx build --no-cache --platform=linux/amd64,linux/arm64 -t jjdenhertog/viberemote:latest -t jjdenhertog/viberemote:$PACKAGE_VERSION --push .",
     "docker:run": "docker run -d -p 2222:22 -p 3000:3000 -p 8443:8443 -e DEVELOPER_PASSWORD=changeme jjdenhertog/viberemote:latest",
     "docker:stop": "docker stop $(docker ps -q --filter ancestor=jjdenhertog/viberemote)",
-    "version:patch": "npm version patch --force && npm version patch --workspace=@vibe-remote/claude-wrapper && npm version patch --workspace=@vibe-remote/vibe-kanban-cleanup",
-    "version:minor": "npm version minor --force && npm version minor --workspace=@vibe-remote/claude-wrapper && npm version minor --workspace=@vibe-remote/vibe-kanban-cleanup",
-    "version:major": "npm version major --force && npm version major --workspace=@vibe-remote/claude-wrapper && npm version major --workspace=@vibe-remote/vibe-kanban-cleanup",
+    "version:patch": "npm version patch --force && pnpm -r --filter './packages/*' version patch",
+    "version:minor": "npm version minor --force && pnpm -r --filter './packages/*' version minor",
+    "version:major": "npm version major --force && pnpm -r --filter './packages/*' version major",
     "release": "npm run docker:push && git push && git push --tags"
   },
   "devDependencies": {
