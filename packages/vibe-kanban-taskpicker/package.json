@@ -1,0 +1,32 @@
+{
+    "name": "@vibe-remote/vibe-kanban-taskpicker",
+    "version": "0.0.1",
+    "description": "Automated task picker for Vibe Kanban using Claude AI",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "tsc --build",
+        "clean": "rm -rf dist tsconfig.tsbuildinfo",
+        "dev": "tsc --watch",
+        "lint": "eslint src --max-warnings 0",
+        "type-check": "tsc --noEmit"
+    },
+    "dependencies": {
+        "axios": "^1.6.2",
+        "dotenv": "^16.3.1"
+    },
+    "devDependencies": {
+        "@types/node": "^20.10.5",
+        "@typescript-eslint/eslint-plugin": "^6.16.0",
+        "@typescript-eslint/parser": "^6.16.0",
+        "eslint": "^8.56.0",
+        "typescript": "^5.3.3"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "files": [
+        "dist",
+        "templates"
+    ]
+}
