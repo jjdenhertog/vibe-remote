@@ -5,12 +5,17 @@
   "type": "module",
   "exports": {
     ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./cleanup": {
       "import": "./dist/vibe-kanban-cleanup.js",
       "types": "./dist/vibe-kanban-cleanup.d.ts"
     }
   },
   "bin": {
-    "vibe-kanban-cleanup": "./dist/vibe-kanban-cleanup.js"
+    "vibe-kanban-cleanup": "./dist/vibe-kanban-cleanup.js",
+    "vibe-start-task": "./dist/commands/startTaskCommand.js"
   },
   "files": [
     "dist"
