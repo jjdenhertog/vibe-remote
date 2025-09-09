@@ -8,7 +8,9 @@ const AUTOMATIONS_FILE = join(PREFERENCES_DIR, 'automations.json');
 
 const DEFAULT_AUTOMATIONS = {
     automaticallyCreatePR: false,
-    doCodeReviewBeforeFinishing: false
+    doCodeReviewBeforeFinishing: false,
+    automaticTaskPicking: false,
+    baseBranch: 'main'
 };
 
 export async function GET() {
@@ -45,7 +47,9 @@ export async function POST(request: NextRequest) {
             
             // Validate required fields
             if (typeof parsed.automaticallyCreatePR !== 'boolean' || 
-                typeof parsed.doCodeReviewBeforeFinishing !== 'boolean') {
+                typeof parsed.doCodeReviewBeforeFinishing !== 'boolean' ||
+                typeof parsed.automaticTaskPicking !== 'boolean' ||
+                typeof parsed.baseBranch !== 'string') {
                 return new NextResponse('Invalid automation settings format', { status: 400 });
             }
         } catch {

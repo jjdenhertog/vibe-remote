@@ -1,11 +1,9 @@
-import { ContainerInfo } from './ContainerInfo.js';
-import { TaskAttempt } from './TaskAttempt.js';
-import { Task } from './Task.js';
+import type { ContainerInfo, TaskAttempt, BasicTask } from '@vibe-remote/vibe-kanban-api/types/api';
 
 export type VibeKanbanContext = {
     containerInfo: ContainerInfo;
     taskAttempt: TaskAttempt;
-    task: Task;
+    task: BasicTask;
     worktreePath: string;
     apiBaseUrl: string;
 };

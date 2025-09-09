@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-import { VibeKanbanContext } from './types/VibeKanbanContext.js';
-import { validateEnvironment } from './functions/validateEnvironment.js';
-import { fetchVibeKanbanContext } from './functions/fetchVibeKanbanContext.js';
-import { createPullRequest } from './functions/createPullRequest.js';
-import { readAutomationPreferences } from './functions/readAutomationPreferences.js';
+import { VibeKanbanContext } from './types/VibeKanbanContext';
+import { validateEnvironment } from './functions/validateEnvironment';
+import { fetchVibeKanbanContext } from './functions/fetchVibeKanbanContext';
+import { createPullRequest } from './functions/createPullRequest';
+import { readAutomationPreferences } from '@vibe-remote/shared-utils/preferences';
 
 class VibeKanbanCleanup {
     // private readonly prBodyFile = 'pr_body.md';

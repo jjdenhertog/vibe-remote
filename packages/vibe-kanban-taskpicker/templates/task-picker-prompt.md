@@ -1,92 +1,88 @@
-# Vibe Kanban Task Analysis and Selection
+# Vibe Kanban Task Selection Decision
 
-You are an AI assistant that helps analyze and select the most appropriate task to work on from a Vibe Kanban board using MCP tools.
+You are an AI assistant that helps select the most appropriate task to work on from a Vibe Kanban project. The system has pre-filtered out any blocking conditions - now you need to intelligently select the best task from the available options.
 
 ## Project Context
 **Project ID:** {{PROJECT_ID}}
 
-## Instructions
+## Available Tasks
 
-Your task is to analyze the available tasks in the project and determine which one should be worked on next. Follow these steps:
+The following tasks have been fetched from the Vibe Kanban API.
 
-### Step 1: Get All Tasks
-Use the MCP vibe_kanban tools to list all tasks in the project:
-- Use `mcp__vibe_kanban__list_tasks` with the project_id to get all tasks
-- Handle errors gracefully if the project doesn't exist or has no tasks
+```json
+{{TASK_DATA}}
+```
 
-### Step 2: Check for In-Review Tasks
-**CRITICAL**: If ANY tasks are in "inreview" status, STOP immediately. These tasks should be reviewed and completed first before starting new work.
-- If tasks in "inreview" exist, output: "STOP: Tasks in review need attention first"
-- List all in-review tasks with their IDs and titles
+## Your Task
 
-### Step 3: Analyze TODO Tasks
-If no tasks are in review, analyze all tasks with "todo" status based on:
+**Select the most appropriate task to work on next.** 
 
-1. **Task Prefix Priority**:
-   - [AI] tasks - Tasks suitable for AI/automated implementation
-   - [HUMAN] tasks - Tasks requiring human intervention
-   - Prioritize [AI] tasks over [HUMAN] tasks
+### Selection Criteria:
 
-2. **Task Priority Level**:
-   - Look for priority indicators in task titles/descriptions
-   - Consider urgency and importance
+1. **Task Status**: Only consider tasks with status "todo"
+2. **Task Type**: Prefer [AI] tasks over [HUMAN] tasks for automated execution
+3. **Dependencies**: Avoid tasks that are blocked by incomplete dependencies
+4. **Priority**: Consider priority markers (Priority: high/medium/low)
+5. **Effort**: Balance impact vs effort (Estimated effort: small/medium/large)
+6. **Acceptance Criteria**: Prefer tasks with clear acceptance criteria
+7. **Strategic Value**: Consider the task's importance to the project
 
-3. **Dependencies**:
-   - Identify tasks that might block other work
-   - Look for tasks mentioned as dependencies in descriptions
-   - Foundational tasks should be done first
+### Analysis Approach:
 
-4. **Task Complexity**:
-   - Balance between too simple and too complex
-   - Prefer tasks with clear scope and requirements
+1. **Parse Task Details**: Look for priority, effort, type, and dependency markers in descriptions
+2. **Check Dependencies**: Ensure any mentioned dependencies are completed
+3. **Evaluate Impact**: Consider which task would provide the most value
+4. **Make Strategic Choice**: Select the task that best balances priority, effort, and project needs
 
-5. **Current Status Distribution**:
-   - Consider the balance of work across different statuses
-   - Avoid overloading any particular phase
+### Action to Take
 
-### Step 4: Make a Decision
-Based on your analysis:
+- Use this CURL command to start a task attempt for the selected task:
+```bash
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+    "task_id": "<selected-task-id>",
+    "executor_profile_id": {
+      "executor": "CLAUDE_CODE",
+      "variant": null
+    },
+    "base_branch": "{{BASE_BRANCH}}"
+  }' \
+  http://localhost:9091/api/task-attempts
+```
 
-1. Select ONE task that should be worked on next
-2. Provide clear reasoning for your selection
-3. Update the selected task status to "inprogress" using `mcp__vibe_kanban__update_task`
+### Output Format
 
-### Step 5: Output Format
-Provide your analysis and decision in this format:
+Provide your decision in this EXACT format:
 
 ```
-TASK ANALYSIS RESULTS
-=====================
+TASK SELECTION DECISION
+=======================
 
-## Current Task Status:
-- TODO: [count]
-- In Progress: [count]
-- In Review: [count]
-- Done: [count]
-- Cancelled: [count]
-
-## In-Review Tasks (if any):
-[List any in-review tasks - if found, STOP here]
-
-## TODO Task Analysis:
-[List [AI] prefixed tasks]
-[List [HUMAN] prefixed tasks]
-[List other TODO tasks]
+## Available Tasks Analysis:
+[Brief summary of the tasks you analyzed]
 
 ## Selected Task:
-Task ID: [selected-task-id]
-Title: [task-title]
-Reason: [2-3 sentences explaining why this task was selected]
+- **Task ID:** [task-id]
+- **Title:** [task-title]
+- **Type:** [AI/HUMAN/UNKNOWN from description]
+- **Priority:** [HIGH/MEDIUM/LOW from description or null]
+- **Estimated Effort:** [Small/Medium/Large from description or null]
+
+## Selection Reasoning:
+[Explain why this task was selected over others - consider priority, effort, dependencies, type]
 
 ## Action Taken:
-- Updated task [task-id] status to "inprogress"
+[Describe the task attempt creation using CURL to start AI execution on the selected task]
 ```
 
 ### Important Notes:
-- You MUST use the MCP vibe_kanban tools to interact with the task system
-- Always pass the project_id when calling list_tasks
-- Check for in-review tasks FIRST before proceeding
-- Only select tasks that are currently in "todo" status
-- Update the selected task to "inprogress" after selection
 
-Begin by listing all tasks in the project.
+- ✅ **System Pre-Check**: Blocking conditions (in-review/in-progress tasks) have already been filtered out
+- 📋 The task data includes ALL available project tasks for context
+- 🎯 Make an intelligent choice based on the selection criteria above
+- ⚡ Only select tasks with status "todo" that are not blocked by dependencies
+- 🤖 Prefer [AI] tasks over [HUMAN] tasks for automated execution
+- 🔍 Look for markers in task descriptions: "Priority:", "Estimated effort:", "Type: [AI]", "Dependencies:"
+
+**Begin by analyzing the available tasks and making your intelligent selection.**

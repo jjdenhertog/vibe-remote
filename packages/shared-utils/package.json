@@ -1,0 +1,34 @@
+{
+  "name": "@vibe-remote/shared-utils",
+  "version": "1.0.0",
+  "description": "Shared utilities for Vibe Remote Workstation",
+  "type": "module",
+  "exports": {
+    "./preferences": {
+      "import": "./dist/preferences.js",
+      "types": "./dist/preferences.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "clean": "rm -rf dist",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "vibe-remote",
+    "shared",
+    "utilities"
+  ],
+  "peerDependencies": {
+    "typescript": ">=5.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

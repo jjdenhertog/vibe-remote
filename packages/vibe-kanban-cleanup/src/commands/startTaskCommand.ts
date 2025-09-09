@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { startTask } from '../functions/startTask.js';
+import { startTask } from '../functions/startTask';
 
 /**
  * CLI command to start a task

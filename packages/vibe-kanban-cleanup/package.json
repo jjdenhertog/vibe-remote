@@ -37,6 +37,10 @@
     "cli",
     "typescript"
   ],
+  "dependencies": {
+    "@vibe-remote/vibe-kanban-api": "workspace:*",
+    "@vibe-remote/shared-utils": "workspace:*"
+  },
   "peerDependencies": {
     "typescript": ">=5.0.0"
   },

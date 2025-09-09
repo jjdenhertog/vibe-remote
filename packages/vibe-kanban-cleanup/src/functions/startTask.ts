@@ -1,4 +1,4 @@
-import type { Task } from '../types/Task.js';
+import type { BasicTask } from '@vibe-remote/vibe-kanban-api/types/api';
 
 export type StartTaskOptions = {
     taskId: string;
@@ -9,7 +9,7 @@ export type StartTaskOptions = {
 export type StartTaskResponse = {
     success: boolean;
     message: string;
-    task?: Partial<Task>;
+    task?: Partial<BasicTask>;
     error?: string;
 };
 
@@ -45,25 +45,22 @@ export async function startTask(options: StartTaskOptions): Promise<StartTaskRes
             };
         }
         
-        // Curl fallback implementation
-        console.log('[startTask] Curl implementation - making empty request with parameters');
+        // Use shared API implementation
+        console.log('[startTask] Using shared API to update task status');
         
-        // Log the curl command that would be used
-        const curlCommand = `curl -X PUT \\
-  -H "Content-Type: application/json" \\
-  -d '{"status": "inprogress"}' \\
-  http://localhost:3000/api/projects/${projectId}/tasks/${taskId}`;
+        const { updateTask } = await import('@vibe-remote/vibe-kanban-api/api/tasks/updateTask');
         
-        console.log('[startTask] Curl command:', curlCommand);
+        const updatedTask = await updateTask(taskId, {
+            status: 'inprogress'
+        });
 
-        // For now, return success as this is a placeholder implementation
         return {
             success: true,
-            message: `Task ${taskId} started successfully via curl (placeholder)`,
+            message: `Task ${taskId} started successfully via shared API`,
             task: {
-                id: taskId,
-                project_id: projectId,
-                status: 'inprogress'
+                id: updatedTask.id,
+                project_id: updatedTask.project_id,
+                status: updatedTask.status
             }
         };
     } catch (error) {

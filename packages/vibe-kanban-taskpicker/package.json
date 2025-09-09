@@ -1,34 +1,47 @@
 {
-    "name": "@vibe-remote/vibe-kanban-taskpicker",
-    "version": "0.0.1",
-    "description": "Automated task picker for Vibe Kanban using Claude AI",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
-    "bin": {
-        "vibe-kanban-taskpicker": "dist/index.js"
-    },
-    "scripts": {
-        "build": "tsc --build",
-        "clean": "rm -rf dist tsconfig.tsbuildinfo",
-        "dev": "tsc --watch",
-        "lint": "eslint src --max-warnings 0",
-        "type-check": "tsc --noEmit"
-    },
-    "dependencies": {
-        "dotenv": "^16.3.1"
-    },
-    "devDependencies": {
-        "@types/node": "^20.10.5",
-        "@typescript-eslint/eslint-plugin": "^6.16.0",
-        "@typescript-eslint/parser": "^6.16.0",
-        "eslint": "^8.56.0",
-        "typescript": "^5.3.3"
-    },
-    "engines": {
-        "node": ">=18.0.0"
-    },
-    "files": [
-        "dist",
-        "templates"
-    ]
+  "name": "@vibe-remote/vibe-kanban-taskpicker",
+  "version": "0.0.1",
+  "description": "Automated task picker for Vibe Kanban using Claude AI",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "bin": {
+    "vibe-kanban-taskpicker": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "clean": "rm -rf dist",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@vibe-remote/vibe-kanban-api": "workspace:*",
+    "@vibe-remote/shared-utils": "workspace:*",
+    "dotenv": "^16.3.1"
+  },
+  "keywords": [
+    "vibe-kanban",
+    "taskpicker",
+    "claude",
+    "ai",
+    "automation",
+    "cli",
+    "typescript"
+  ],
+  "peerDependencies": {
+    "typescript": ">=5.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
 }

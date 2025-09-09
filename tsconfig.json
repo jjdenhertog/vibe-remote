@@ -3,10 +3,19 @@
   "files": [],
   "references": [
     {
+      "path": "./packages/shared-utils"
+    },
+    {
+      "path": "./packages/vibe-kanban-api"
+    },
+    {
       "path": "./packages/claude-wrapper"
     },
     {
       "path": "./packages/vibe-kanban-cleanup"
+    },
+    {
+      "path": "./packages/vibe-kanban-taskpicker"
     },
     {
       "path": "./apps/web"

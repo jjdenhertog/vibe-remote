@@ -1,0 +1,1 @@
+export { readAutomationPreferences, type AutomationPreferences } from '@vibe-remote/shared-utils/preferences';

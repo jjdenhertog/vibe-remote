@@ -5,12 +5,12 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/claude-flow-wrapper.js",
-      "types": "./dist/claude-flow-wrapper.d.ts"
+      "import": "./dist/claude-wrapper.js",
+      "types": "./dist/claude-wrapper.d.ts"
     }
   },
   "bin": {
-    "claude-flow-wrapper": "./dist/claude-flow-wrapper.js"
+    "claude-wrapper": "./dist/claude-wrapper.js"
   },
   "files": [
     "dist",
@@ -30,6 +30,9 @@
     "cli",
     "typescript"
   ],
+  "dependencies": {
+    "@vibe-remote/shared-utils": "workspace:*"
+  },
   "peerDependencies": {
     "typescript": ">=5.0.0"
   },

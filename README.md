@@ -3,13 +3,14 @@
 [![Docker Pulls](https://img.shields.io/docker/pulls/jjdenhertog/viberemote)](https://hub.docker.com/r/jjdenhertog/viberemote)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Remote AI development environment with Vibe-Kanban task management and Claude AI integration. 
+Remote AI development environment with Vibe-Kanban task management, Claude AI integration, and web-based configuration.
 
 ## ✨ What's Included
 
-- **[Claude-Flow](https://github.com/ruvnet/claude-flow)** - AI orchestration with hive-mind capabilities
-- **[Vibe-Kanban](https://www.vibekanban.com/)** - Visual task management
+- **AI Context Configuration** - Web interface for project goals and coding standards  
+- **[Vibe-Kanban](https://www.vibekanban.com/)** - Visual task management with AI agents
 - **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** - Anthropic's official CLI
+- **Automated Workflows** - PR creation and code review automation
 - **GitHub CLI** - Repository management
 - **Persistent Storage** - All auth/configs survive container recreations
 
@@ -127,94 +128,41 @@ ssh developer@localhost -p 9090
 claude login              # Claude Code auth
 gh auth login            # GitHub CLI auth
 
-# 2.b Add vibe-kanban MCP (optional)
-claude mcp add vibe_kanban -- npx -y vibe-kanban --mcp
-
 # 3. Configure Git
 git config --global user.name "Your Name"
 git config --global user.email "your@email.com"
 
 # 4. Clone your project into /workspace/project
-cd /workspace/projectt
+cd /workspace/project
 git clone git@github.com:user/repo.git .
 # or
 gh repo clone user/repo .
 
-# 5. Initiate project
+# 5. Initialize project
 init-project
+
+# 6. Configure AI context and automations
+# Visit http://localhost:9092 to set up project goals and coding standards
 ```
 
 ## 💡 Working with AI Tools
 
 ### Vibe-Kanban
-- Access the UI at port `9091` or the configured port.
+- Access the UI at port `9091` or the configured port
 - Create tasks and let AI agents work on them
 - See [documentation](https://www.vibekanban.com/docs) for advanced features
 
-### Setting up Vibe-Kanban with Claude-Flow
-
-To integrate Claude-Flow with Vibe-Kanban for enhanced AI orchestration:
-
-#### 1. Add Agent Profiles
-In Vibe-Kanban settings, add the following JSON to the agent profiles:
-
-```json
-{
-  "label": "claude-flow",
-  "CLAUDE_CODE": {
-    "command": {
-      "base": "claude-flow-wrapper",
-      "params": [
-        "swarm",
-        "--verbose",
-        "--output-format=stream-json",
-        "--claude"
-      ]
-    },
-    "append_prompt": null,
-    "plan": false
-  },
-  "mcp_config_path": null,
-  "variants": [
-    {
-      "label": "hive",
-      "CLAUDE_CODE": {
-        "command": {
-          "base": "claude-flow-wrapper",
-          "params": [
-            "hive",
-            "-p",
-            "--verbose",
-            "--output-format=stream-json",
-            "--claude"
-          ]
-        },
-        "append_prompt": null,
-        "plan": false
-      },
-      "mcp_config_path": null
-    }
-  ]
-}
-```
-
-#### 2. Configure Project Setup Script
-In Vibe-Kanban project settings, add the following under `setup script` to initialize Claude-Flow for each created worktree:
-
-```bash
-#!/bin/bash
-npx -y claude-flow@alpha init --force
-```
-
-#### Important Notes:
-- The `init-project` command automatically updates `.gitignore` to exclude Claude-Flow files from your repository
-- Claude Code interactions are not visible in the Vibe-Kanban UI interface
+### Web Configuration Interface
+- Visit `http://localhost:9092` to configure AI context and automations
+- Set up project goals, coding standards, and development preferences  
+- Enable automatic PR creation and code review workflows
+- All settings persist across container restarts
 
 ## 🔒 Enhanced Security with Firewall
 
-The Vibe 🤮 coding approach runs Claude Code with `--dangerously-skip-permissions` for maximum flexibility. While running in a separate Docker container provides good isolation, you can add an extra layer of security by implementing a firewall using a Squid proxy.
+The workstation runs Claude Code with enhanced AI capabilities in a containerized environment. For additional security, you can implement a firewall using a Squid proxy.
 
-This setup creates a whitelist-based network filter that only allows connections to approved domains, preventing potential unwanted network access. See [FIREWALL.md](FIREWALL.md) for detailed setup instructions on implementing a Squid proxy firewall for your Vibe 🤮 Remote workstation.
+This setup creates a whitelist-based network filter that only allows connections to approved domains, preventing potential unwanted network access. See [FIREWALL.md](FIREWALL.md) for detailed setup instructions.
 
 ## 🖥️ VS Code / Cursor Remote Development
 
@@ -266,20 +214,23 @@ Also update:
 │   └── npm/          # NPM config
 ├── project/          # Volume 2: Your project files
 └── data/             # Volume 3: Workspace data
-    └── .vibe-kanban/ # Task management data
+    ├── .vibe-kanban/ # Task management data
+    └── preferences/  # AI context and automation settings
 ```
 
 **Benefits:**
 - **Separate volumes** for credentials, projects, and data
 - **Easy backup** - backup only what you need
-- **Better security** - credentials isolated from project files
+- **Better security** - credentials isolated from project files  
 - **Flexible management** - each volume can be managed independently
 
 ## 📚 Tool Documentation
 
-- **Claude-Flow**: [Configuration](https://github.com/ruvnet/claude-flow/wiki), [Hive-Mind Setup](https://github.com/ruvnet/claude-flow/wiki/Hive-Mind)
 - **Vibe-Kanban**: [Getting Started](https://www.vibekanban.com/docs)
 - **Claude Code**: [Setup Guide](https://docs.anthropic.com/en/docs/claude-code/setup)
+- **Advanced Configuration**: [CLAUDE.md](CLAUDE.md)
+- **Security Setup**: [FIREWALL.md](FIREWALL.md)
+- **API Reference**: [VIBE_KANBAN_API.md](VIBE_KANBAN_API.md)
 
 ## 📄 License
 

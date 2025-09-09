@@ -22,7 +22,7 @@ Ensure every AI decision is guided by documented human preferences rather than a
 ### Integration Points
 
 #### Claude-Wrapper Enhancement
-- **Current**: Uses `claude-flow-wrapper.ts` to process `claude-flow-prompt.md` template for Claude-Flow interaction
+- **Current**: Uses `claude-wrapper.ts` to process `claude-flow-prompt.md` template for Claude-Flow interaction
 - **Keep**: Existing claude-flow-prompt.md template stays the same (handles Claude-Flow orchestration)  
 - **Addition**: Add preference injection ON TOP of existing template content
 - **Method**: Prepend preferences section before the existing template content

@@ -3,23 +3,31 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Editor } from '@monaco-editor/react';
 import { enqueueSnackbar } from 'notistack';
-import { Save, ArrowLeft, ToggleLeft, ToggleRight, CheckCircle2, GitPullRequest } from 'lucide-react';
+import { Save, ArrowLeft, ToggleLeft, ToggleRight, CheckCircle2, GitPullRequest, Settings, GitBranch } from 'lucide-react';
 import Link from 'next/link';
+import type { BranchInfo, ProjectBranchesResponse } from '@vibe-remote/vibe-kanban-api/types/api';
 
 type AutomationSettings = {
     automaticallyCreatePR: boolean;
     doCodeReviewBeforeFinishing: boolean;
+    automaticTaskPicking: boolean;
+    baseBranch: string;
 };
+
 
 export const AutomationsPage = () => {
     const [settings, setSettings] = useState<AutomationSettings>({
         automaticallyCreatePR: false,
-        doCodeReviewBeforeFinishing: false
+        doCodeReviewBeforeFinishing: false,
+        automaticTaskPicking: false,
+        baseBranch: 'main'
     });
     const [jsonValue, setJsonValue] = useState('');
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [jsonError, setJsonError] = useState<string | null>(null);
+    const [branchData, setBranchData] = useState<ProjectBranchesResponse | null>(null);
+    const [branchesLoading, setBranchesLoading] = useState(false);
 
     const loadSettings = useCallback(async () => {
         try {
@@ -44,9 +52,29 @@ export const AutomationsPage = () => {
         }
     }, []);
 
+    const loadBranches = useCallback(async () => {
+        setBranchesLoading(true);
+        try {
+            const response = await fetch('/api/project-branches');
+            if (response.ok) {
+                const data = await response.json();
+                setBranchData(data);
+            } else {
+                console.error('Failed to fetch branches:', response.statusText);
+                enqueueSnackbar('Failed to fetch project branches', { variant: 'warning' });
+            }
+        } catch (error) {
+            console.error('Error loading branches:', error);
+            enqueueSnackbar('Error loading project branches', { variant: 'error' });
+        } finally {
+            setBranchesLoading(false);
+        }
+    }, []);
+
     useEffect(() => {
         loadSettings();
-    }, [loadSettings]);
+        loadBranches();
+    }, [loadSettings, loadBranches]);
 
     const handleSave = useCallback(async () => {
         setSaving(true);
@@ -104,6 +132,24 @@ export const AutomationsPage = () => {
     const handleCodeReviewToggle = useCallback(() => {
         handleToggle('doCodeReviewBeforeFinishing');
     }, [handleToggle]);
+
+    const handleTaskPickingToggle = useCallback(() => {
+        handleToggle('automaticTaskPicking');
+    }, [handleToggle]);
+
+    const handleBranchChange = useCallback((branch: string) => {
+        const newSettings = {
+            ...settings,
+            baseBranch: branch
+        };
+        setSettings(newSettings);
+        setJsonValue(JSON.stringify(newSettings, null, 2));
+        setJsonError(null);
+    }, [settings]);
+
+    const handleBranchSelectChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+        handleBranchChange(e.target.value);
+    }, [handleBranchChange]);
 
     const handleSaveClick = useCallback(() => {
         handleSave().catch(console.error);
@@ -218,6 +264,78 @@ export const AutomationsPage = () => {
                                 </div>
                             </div>
 
+                            {/* Automatic Task Picking */}
+                            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center">
+                                        <Settings className="w-5 h-5 text-purple-600 dark:text-purple-400 mr-3" />
+                                        <div>
+                                            <h3 className="font-medium text-gray-900 dark:text-white">
+                                                Automatic Task Picking
+                                            </h3>
+                                            <p className="text-sm text-gray-600 dark:text-gray-300">
+                                                Automatically pick and start the next appropriate task when ready
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={handleTaskPickingToggle}
+                                        className={`p-1 rounded-full transition-colors ${
+                                            settings.automaticTaskPicking 
+                                                ? 'text-green-600 hover:text-green-700' 
+                                                : 'text-gray-400 hover:text-gray-500'
+                                        }`}
+                                    >
+                                        {settings.automaticTaskPicking ? (
+                                            <ToggleRight className="w-8 h-8" />
+                                        ) : (
+                                            <ToggleLeft className="w-8 h-8" />
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Base Branch Selection */}
+                            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                                <div className="flex items-start">
+                                    <GitBranch className="w-5 h-5 text-orange-600 dark:text-orange-400 mr-3 mt-1" />
+                                    <div className="flex-1">
+                                        <h3 className="font-medium text-gray-900 dark:text-white mb-2">
+                                            Base Branch for Tasks
+                                        </h3>
+                                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                                            Select the branch to use as base when starting new tasks
+                                        </p>
+                                        
+                                        {branchesLoading ? (
+                                            <div className="text-sm text-gray-500">Loading branches...</div>
+                                        ) : branchData ? (
+                                            <div className="space-y-2">
+                                                <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                                                    Project: {branchData.projectName}
+                                                </div>
+                                                <select
+                                                    value={settings.baseBranch}
+                                                    onChange={handleBranchSelectChange}
+                                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                >
+                                                    {branchData.branches.map((branch: BranchInfo) => (
+                                                        <option key={branch.name} value={branch.name}>
+                                                            {branch.name} {branch.is_current ? ' (current)' : ''}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        ) : (
+                                            <div className="text-sm text-red-600 dark:text-red-400">
+                                                Failed to load branches. Check if Vibe Kanban is running.
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
                             {/* Status */}
                             <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                                 <h3 className="font-medium text-blue-900 dark:text-blue-100 mb-2">
@@ -244,6 +362,23 @@ export const AutomationsPage = () => {
                                         )}
                                         <span className="text-blue-800 dark:text-blue-200">
                                             Code Review: {settings.doCodeReviewBeforeFinishing ? 'Enabled' : 'Disabled'}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center">
+                                        {!!settings.automaticTaskPicking && (
+                                            <span className="w-2 h-2 rounded-full mr-2 bg-green-500" />
+                                        )}
+                                        {!settings.automaticTaskPicking && (
+                                            <span className="w-2 h-2 rounded-full mr-2 bg-gray-400" />
+                                        )}
+                                        <span className="text-blue-800 dark:text-blue-200">
+                                            Task Picking: {settings.automaticTaskPicking ? 'Enabled' : 'Disabled'}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center">
+                                        <span className="w-2 h-2 rounded-full mr-2 bg-blue-500" />
+                                        <span className="text-blue-800 dark:text-blue-200">
+                                            Base Branch: {settings.baseBranch}
                                         </span>
                                     </div>
                                 </div>

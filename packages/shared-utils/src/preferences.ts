@@ -1,18 +1,22 @@
-import { readFileSync, existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
-type AutomationPreferences = {
+export type AutomationPreferences = {
     automaticallyCreatePR: boolean;
     doCodeReviewBeforeFinishing: boolean;
+    automaticTaskPicking: boolean;
+    baseBranch: string;
 };
 
 export function readAutomationPreferences(): AutomationPreferences {
     const defaultPreferences: AutomationPreferences = {
         automaticallyCreatePR: false,
-        doCodeReviewBeforeFinishing: false
+        doCodeReviewBeforeFinishing: false,
+        automaticTaskPicking: false,
+        baseBranch: 'main'
     };
 
     const preferencesPath = '/workspace/data/preferences/automations.json';
-    
+
     if (!existsSync(preferencesPath)) {
         return defaultPreferences;
     }
@@ -20,10 +24,12 @@ export function readAutomationPreferences(): AutomationPreferences {
     try {
         const fileContent = readFileSync(preferencesPath, 'utf8');
         const preferences = JSON.parse(fileContent) as Partial<AutomationPreferences>;
-        
+
         return {
             automaticallyCreatePR: preferences.automaticallyCreatePR ?? defaultPreferences.automaticallyCreatePR,
-            doCodeReviewBeforeFinishing: preferences.doCodeReviewBeforeFinishing ?? defaultPreferences.doCodeReviewBeforeFinishing
+            doCodeReviewBeforeFinishing: preferences.doCodeReviewBeforeFinishing ?? defaultPreferences.doCodeReviewBeforeFinishing,
+            automaticTaskPicking: preferences.automaticTaskPicking ?? defaultPreferences.automaticTaskPicking,
+            baseBranch: preferences.baseBranch ?? defaultPreferences.baseBranch
         };
     } catch (error) {
         console.warn(`Warning: Could not read or parse automations.json: ${String(error)}`);
