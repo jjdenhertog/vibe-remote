@@ -4,6 +4,9 @@
     "description": "Automated task picker for Vibe Kanban using Claude AI",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
+    "bin": {
+        "vibe-kanban-taskpicker": "dist/index.js"
+    },
     "scripts": {
         "build": "tsc --build",
         "clean": "rm -rf dist tsconfig.tsbuildinfo",
@@ -12,7 +15,6 @@
         "type-check": "tsc --noEmit"
     },
     "dependencies": {
-        "axios": "^1.6.2",
         "dotenv": "^16.3.1"
     },
     "devDependencies": {

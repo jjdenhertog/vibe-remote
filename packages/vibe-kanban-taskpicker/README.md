@@ -1,14 +1,22 @@
 # Vibe Kanban Task Picker
 
-Automated task selection and execution system for Vibe Kanban using Claude AI.
+Automated task selection and analysis system for Vibe Kanban using Claude AI with MCP tools integration.
 
 ## Overview
 
-This package provides an automated task picker that:
-1. Fetches available tasks from Vibe Kanban projects
-2. Uses Claude AI to intelligently select the most appropriate task
-3. Executes the selected task using Claude
-4. Updates task status automatically
+This package provides an intelligent task picker that:
+1. Uses Claude's MCP vibe_kanban tools to analyze tasks directly
+2. Intelligently selects the most appropriate task based on multiple criteria
+3. Automatically updates task status to "inprogress"
+4. Stops if tasks are in review status (requiring attention first)
+
+## Key Features
+
+- **MCP Integration**: Direct integration with Claude's MCP vibe_kanban tools
+- **Intelligent Analysis**: Multi-criteria task evaluation and selection
+- **Priority System**: [AI] prefixed tasks prioritized over [HUMAN] tasks
+- **Review Gate**: Automatic stop when tasks need review
+- **Dependency Awareness**: Considers task dependencies for optimal ordering
 
 ## Installation
 
@@ -19,34 +27,25 @@ pnpm run build
 
 ## Configuration
 
+### Required Setup
+
+Ensure Claude has the MCP vibe_kanban server configured and accessible.
+
 ### Environment Variables
 
-Copy `.env.example` to `.env` and configure:
-
-- `CLAUDE_COMMAND`: Path to Claude CLI command (default: `claude`)
-- `VIBE_API_URL`: Vibe Kanban API endpoint (default: `http://localhost:3001`)
-- `TASK_CHECK_INTERVAL`: Seconds between task checks (default: `300`)
-
-### Supervisord Setup
-
-For automatic task picking at intervals:
-
-1. Copy `supervisord.conf.example` to your supervisord configuration directory
-2. Adjust paths and environment variables
-3. Reload supervisord configuration
-
-```bash
-supervisorctl reread
-supervisorctl update
-supervisorctl start vibe-taskpicker
-```
+- `VIBE_PROJECT_ID`: The project ID to analyze (can also be passed as CLI argument)
+- `TASK_CHECK_INTERVAL`: Seconds between task checks (default: 300)
 
 ## Usage
 
-### Manual Execution
+### Command Line
 
 ```bash
-node dist/index.js
+# Using command-line argument
+vibe-kanban-taskpicker <project-id>
+
+# Using environment variable
+VIBE_PROJECT_ID=<project-id> vibe-kanban-taskpicker
 ```
 
 ### As a Module
@@ -55,22 +54,50 @@ node dist/index.js
 import { runTaskPicker } from '@vibe-remote/vibe-kanban-taskpicker';
 
 await runTaskPicker({
-    claudeCommand: 'claude',
-    vibeApiUrl: 'http://localhost:3001',
+    projectId: 'your-project-id',
     checkInterval: 300
 });
 ```
 
 ## How It Works
 
-1. **Project Discovery**: Fetches all available projects from Vibe Kanban
-2. **Task Analysis**: For each project, identifies TODO tasks
-3. **Intelligent Selection**: Uses Claude to analyze and select the most appropriate task based on:
-   - Priority and dependencies
-   - Complexity and clarity
-   - Value to the project
-4. **Execution**: Claude executes the selected task autonomously
-5. **Status Updates**: Automatically updates task status (todo → in-progress → done)
+### 1. Task Retrieval
+Uses `mcp__vibe_kanban__list_tasks` to fetch all tasks in the specified project.
+
+### 2. Review Check
+**CRITICAL**: If any tasks have "inreview" status, the picker stops immediately. These tasks need to be reviewed and completed before new work begins.
+
+### 3. Task Analysis
+Evaluates TODO tasks based on:
+
+- **Task Prefixes**
+  - `[AI]` - Tasks suitable for AI/automated implementation (highest priority)
+  - `[HUMAN]` - Tasks requiring human intervention (lower priority)
+  
+- **Dependencies**
+  - Tasks that block other work are prioritized
+  - Foundational tasks selected first
+  
+- **Complexity Balance**
+  - Prefers tasks with clear scope and requirements
+  - Balances between too simple and too complex
+  
+- **Status Distribution**
+  - Considers current work distribution
+  - Avoids overloading any phase
+
+### 4. Task Selection & Update
+- Selects the optimal task based on analysis
+- Updates task status to "inprogress" using `mcp__vibe_kanban__update_task`
+- Provides clear reasoning for the selection
+
+## Task Selection Template
+
+The analysis logic is defined in `templates/task-picker-prompt.md`. This template:
+- Instructs Claude to use MCP tools
+- Defines the analysis criteria
+- Specifies the output format
+- Ensures proper status updates
 
 ## Development
 
@@ -88,29 +115,45 @@ pnpm run lint
 pnpm run build
 ```
 
-## Integration with Docker
+## Integration with Supervisord
 
-When running in a Docker container with supervisord:
+For automatic task picking at intervals:
 
-1. The package is built during the Docker image creation
-2. Supervisord manages the process lifecycle
-3. The process exits after completing one task
-4. Supervisord automatically restarts it for the next cycle
+```ini
+[program:vibe-taskpicker]
+command=node /app/packages/vibe-kanban-taskpicker/dist/index.js
+directory=/app/packages/vibe-kanban-taskpicker
+environment=VIBE_PROJECT_ID="your-project-id",TASK_CHECK_INTERVAL="300"
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/supervisor/vibe-taskpicker.out.log
+stderr_logfile=/var/log/supervisor/vibe-taskpicker.err.log
+```
 
-## API Endpoints Used
+## MCP Tools Used
 
-- `GET /api/projects` - List all projects
-- `GET /api/projects/:id/tasks` - List tasks for a project
-- `PATCH /api/projects/:id/tasks/:taskId` - Update task status
+- `mcp__vibe_kanban__list_tasks` - Retrieve all tasks in a project
+- `mcp__vibe_kanban__update_task` - Update task status
+- `mcp__vibe_kanban__get_task` - Get detailed task information (if needed)
 
 ## Error Handling
 
-- Graceful handling of API connection errors
-- Claude execution failures are logged but don't crash the process
-- Automatic retry through supervisord on process exit
+- Graceful handling of MCP tool failures
+- Clear error messages for missing project IDs
+- Automatic stop on review-required tasks
+- Detailed logging for debugging
 
 ## Logging
 
-Logs are written to stdout/stderr and captured by supervisord:
-- `/var/log/supervisor/vibe-taskpicker.out.log` - Standard output
-- `/var/log/supervisor/vibe-taskpicker.err.log` - Error output
+All operations are logged with `[TaskPicker]` prefix:
+- Task analysis progress
+- Selected task details
+- Status updates
+- Error conditions
+
+## Future Enhancements
+
+- Support for multiple project analysis
+- Task execution integration
+- Custom priority weighting
+- Historical task selection learning
