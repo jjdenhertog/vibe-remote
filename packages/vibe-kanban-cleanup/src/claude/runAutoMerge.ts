@@ -82,6 +82,7 @@ function processTemplate(template: string, context: {
     taskDescription?: string;
     pullRequestTitle?: string;
     pullRequestDescription?: string;
+    pullRequestUrl?: string;
     branchName?: string;
     baseBranch?: string;
     worktreePath?: string;
@@ -103,6 +104,8 @@ function processTemplate(template: string, context: {
     processed = processed.replace(/{{branchName}}/g, context.branchName || '');
     processed = processed.replace(/{{baseBranch}}/g, context.baseBranch || '');
     processed = processed.replace(/{{WORKTREE_PATH}}/g, context.worktreePath || process.cwd());
+    processed = processed.replace(/{{PR_URL}}/g, context.pullRequestUrl || '');
+    processed = processed.replace(/\[PR_URL]/g, context.pullRequestUrl || '');
     
     // Replace context placeholders
     processed = processed.replace(/{{PROJECT_CONTEXT}}/g, context.projectContext || 'No project context available');
@@ -208,9 +211,8 @@ Criteria for merging:
 - Code follows the project's coding standards
 - Changes are complete and not work-in-progress
 
-If you decide to merge, first create a PR then merge it:
-1. Get the PR URL from the previous step (should be available in context)
-2. Execute: gh pr merge [PR_URL] --squash --body "Auto-merged by vibe-kanban" --delete-branch
+If you decide to merge, execute:
+gh pr merge [PR_URL] --squash --body "Auto-merged by vibe-kanban" --delete-branch
 
 Note: You may see an error about checking out the branch - this is expected in a worktree and can be ignored.
 
@@ -219,8 +221,11 @@ If you decide NOT to merge, explain why but don't execute any merge commands.`;
 
 /**
  * Runs auto-merge decision process with Claude
+ * @param attemptId - The task attempt ID to fetch task context
+ * @param prUrl - The PR URL to merge if Claude decides to
+ * @param customPrompt - Optional custom prompt template (uses default if not provided)
  */
-export async function runAutoMerge(attemptId: string): Promise<void> {
+export async function runAutoMerge(attemptId: string, prUrl: string, customPrompt?: string): Promise<void> {
     let tempFile: string | null = null;
     
     try {
@@ -238,29 +243,54 @@ export async function runAutoMerge(attemptId: string): Promise<void> {
         if (!taskAttempt) {
             throw new Error(`Task attempt not found for ID: ${attemptId}`);
         }
+        
+        console.log(`✅ Task attempt found - Branch: ${taskAttempt.branch}, Base: ${taskAttempt.base_branch}`);
 
         // Get task details
         console.log(`🔍 Fetching task data for task ID: ${taskAttempt.task_id}`);
         const task = await getTask(taskAttempt.task_id);
+        console.log(`✅ Task found - Title: "${task?.title || 'Unknown'}"`);
 
         // Get automation preferences
         const preferences: AutomationPreferences = readAutomationPreferences();
         
         // Get project context
+        console.log(`📄 Reading project context and coding standards...`);
         const preferenceContext = readPreferenceFiles();
+        
+        if (preferenceContext.projectContext) {
+            console.log(`✅ Project context loaded (${preferenceContext.projectContext.length} chars)`);
+        } else {
+            console.log(`⚠️  No project context found`);
+        }
+        
+        if (preferenceContext.codingStandards) {
+            console.log(`✅ Coding standards loaded (${preferenceContext.codingStandards.length} chars)`);
+        } else {
+            console.log(`⚠️  No coding standards found`);
+        }
 
-        // Get auto-merge prompt template (from file or preference)
-        let promptTemplate = preferences.autoMergePrompt;
+        // Get auto-merge prompt template (from parameter, preference, or default)
+        let promptTemplate = customPrompt || preferences.autoMergePrompt;
         if (!promptTemplate) {
             promptTemplate = getAutoMergePromptTemplate();
         }
+        
+        // Log the PR URL that will be used for merging
+        console.log(`🔗 PR URL to merge if approved: ${prUrl}`);
+        console.log(`🎯 Merge decision mode: Claude will evaluate local changes`);
 
+        // Replace PR_URL placeholder with actual PR URL
+        promptTemplate = promptTemplate.replace(/\[PR_URL]/g, prUrl);
+        promptTemplate = promptTemplate.replace(/{{PR_URL}}/g, prUrl);
+        
         // Process template with context
         const processedPrompt = processTemplate(promptTemplate, {
             taskTitle: task?.title || 'Unknown Task',
             taskDescription: task?.description || 'No description available',
             pullRequestTitle: `Task: ${task?.title || 'Unknown'}`,
             pullRequestDescription: task?.description || 'Auto-generated PR',
+            pullRequestUrl: prUrl,
             branchName: process.env.GITHUB_HEAD_REF || taskAttempt.branch || 'feature-branch',
             baseBranch: preferences.baseBranch || taskAttempt.base_branch || 'main',
             worktreePath: process.cwd(),
@@ -283,11 +313,14 @@ export async function runAutoMerge(attemptId: string): Promise<void> {
         
         console.log(`📝 Created temporary prompt file: ${tempFile}`);
         console.log(`🤖 Executing Claude auto-merge decision...`);
+        console.log(`📁 Working directory: ${process.cwd()}`);
+        console.log(`🎯 Claude will analyze local worktree changes against task requirements`);
 
         // Execute Claude command
         await runClaudeCommand(tempFile);
         
-        console.log(`✅ Auto-merge decision completed successfully`);
+        console.log(`✅ Auto-merge decision process completed`);
+        console.log(`📋 Note: Check above output for Claude's merge decision and actions`);
 
     } catch (error) {
         console.error(`❌ Auto-merge execution failed:`, error);

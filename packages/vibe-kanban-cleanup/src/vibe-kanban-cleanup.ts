@@ -12,14 +12,16 @@ class VibeKanbanCleanup {
     // private readonly prBodyFile = 'pr_body.md';
     private vibeContext?: VibeKanbanContext;
 
-    private async handleAutoMerge(preferences: ReturnType<typeof readAutomationPreferences>): Promise<void> {
+    private async handleAutoMerge(preferences: ReturnType<typeof readAutomationPreferences>, prUrl: string): Promise<void> {
         if (!preferences.autoMergePR || !this.vibeContext) {
             return;
         }
 
+        console.error(`\n🔗 PR URL for merge: ${prUrl}`);
+
         if (preferences.autoMergeDecisionMode === 'always') {
             console.error('\n🔀 Auto-merge mode is "always" - attempting to merge PR...');
-            const mergeResult = await mergePullRequest();
+            const mergeResult = await mergePullRequest(prUrl);
             
             if (mergeResult.success) {
                 console.error(`✅ ${mergeResult.message}`);
@@ -32,9 +34,12 @@ class VibeKanbanCleanup {
 
         if (preferences.autoMergeDecisionMode === 'claude-decision') {
             console.error('\n🤖 Auto-merge mode is "claude-decision" - running Claude evaluation...');
+            console.error(`📋 Task context: "${this.vibeContext.task.title}"`);
+            console.error(`🔍 Attempt ID: ${this.vibeContext.containerInfo.attempt_id}`);
             
             try {
-                await runAutoMerge(this.vibeContext.containerInfo.attempt_id);
+                await runAutoMerge(this.vibeContext.containerInfo.attempt_id, prUrl, preferences.autoMergePrompt);
+                console.error('✅ Claude auto-merge evaluation completed');
                 // Note: The Claude decision process will handle the actual merge decision
                 // This is intentionally left open-ended as Claude will determine the action
             } catch (error) {
@@ -61,7 +66,7 @@ class VibeKanbanCleanup {
                 console.error(`\n✅ PR created: ${prUrl}`);
                 
                 // Handle auto-merge based on preferences
-                await this.handleAutoMerge(preferences);
+                await this.handleAutoMerge(preferences, prUrl);
             } else {
                 console.error('\n⏸️ PR creation skipped (automaticallyCreatePR is disabled in preferences)');
             }

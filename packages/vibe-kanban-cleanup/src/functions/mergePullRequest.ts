@@ -11,21 +11,21 @@ export type MergeResult = {
     errorType?: 'worktree' | 'permission' | 'network' | 'conflict' | 'unknown';
 };
 
-export async function mergePullRequest(): Promise<MergeResult> {
+export async function mergePullRequest(prUrl: string): Promise<MergeResult> {
     const timestamp = new Date().toISOString();
     
     try {
-        console.error(`[${timestamp}] 🔀 Attempting to merge PR from current worktree branch`);
+        console.error(`[${timestamp}] 🔀 Attempting to merge PR: ${prUrl}`);
         
-        const mergeCommand = `gh pr merge --squash --body "Auto-merged by vibe-kanban" --delete-branch`;
+        const mergeCommand = `gh pr merge "${prUrl}" --squash --body "Auto-merged by vibe-kanban" --delete-branch`;
         
         await execAsync(mergeCommand);
         
-        console.error(`[${timestamp}] ✅ PR successfully merged`);
+        console.error(`[${timestamp}] ✅ PR successfully merged: ${prUrl}`);
         
         return {
             success: true,
-            message: 'PR successfully merged',
+            message: `PR successfully merged: ${prUrl}`,
             timestamp
         };
         
