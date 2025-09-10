@@ -15,6 +15,18 @@
     "./preference-context": {
       "import": "./dist/preference-context.js",
       "types": "./dist/preference-context.d.ts"
+    },
+    "./file-preferences": {
+      "import": "./dist/file-preferences.js",
+      "types": "./dist/file-preferences.d.ts"
+    },
+    "./route-factory": {
+      "import": "./dist/route-factory.js",
+      "types": "./dist/route-factory.d.ts"
+    },
+    "./automation-types": {
+      "import": "./dist/automation-types.js",
+      "types": "./dist/automation-types.d.ts"
     }
   },
   "files": [
@@ -34,7 +46,12 @@
     "utilities"
   ],
   "peerDependencies": {
+    "next": ">=14.0.0",
     "typescript": ">=5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "next": "^15.0.0"
   },
   "engines": {
     "node": ">=20.0.0"

@@ -120,7 +120,7 @@ export async function runAutoMerge(attemptId: string, prUrl: string, customPromp
         }
 
         // Get auto-merge prompt template (from parameter, preference, or file)
-        let promptTemplate = customPrompt || preferences.autoMergePrompt;
+        let promptTemplate = customPrompt || preferences.claudeMergePrompt;
         if (!promptTemplate) {
             const templateFromFile = getAutoMergePromptTemplate();
             if (!templateFromFile) {

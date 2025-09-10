@@ -41,6 +41,9 @@ importers:
       '@vibe-remote/claude-wrapper':
         specifier: workspace:*
         version: link:../../packages/claude-wrapper
+      '@vibe-remote/shared-utils':
+        specifier: workspace:*
+        version: link:../../packages/shared-utils
       '@vibe-remote/vibe-kanban-api':
         specifier: workspace:*
         version: link:../../packages/vibe-kanban-api
@@ -100,6 +103,13 @@ importers:
       typescript:
         specifier: '>=5.0.0'
         version: 5.9.2
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.11
+      next:
+        specifier: ^15.0.0
+        version: 15.5.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
 
   packages/vibe-kanban-api:
     dependencies:

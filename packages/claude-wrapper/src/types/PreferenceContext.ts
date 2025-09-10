@@ -1,5 +1,1 @@
-
-export type PreferenceContext = {
-    codingStandards?: string;
-    projectContext?: string;
-};
+export type { PreferenceContext } from '@vibe-remote/shared-utils/preference-context';

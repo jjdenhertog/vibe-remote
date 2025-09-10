@@ -91,3 +91,13 @@ export function processTemplate(template: string, context: {
 
     return processed;
 }
+
+/**
+ * Reads the auto-merge prompt template from the expected location
+ * @returns The template content or null if not found
+ */
+export function readAutoMergePromptTemplate(): string | null {
+    const templatePath = '/workspace/data/preferences/auto-merge-prompt.md';
+
+    return readPromptTemplate(templatePath, 'auto-merge-prompt.md');
+}

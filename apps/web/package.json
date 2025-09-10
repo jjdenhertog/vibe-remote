@@ -14,6 +14,7 @@
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
     "@vibe-remote/claude-wrapper": "workspace:*",
+    "@vibe-remote/shared-utils": "workspace:*",
     "@vibe-remote/vibe-kanban-api": "workspace:*",
     "lucide-react": "^0.542.0",
     "monaco-editor": "^0.52.2",

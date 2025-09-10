@@ -1,10 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { readFile, writeFile, mkdir } from 'node:fs/promises';
-import { join } from 'node:path';
-import { existsSync } from 'node:fs';
-
-const PREFERENCES_DIR = '/workspace/data/preferences';
-const CODING_STANDARDS_FILE = join(PREFERENCES_DIR, 'coding-standards.md');
+import { createTextPreferenceRoute } from '@vibe-remote/shared-utils/route-factory';
 
 const DEFAULT_CODING_STANDARDS = `# Coding Standards
 
@@ -34,45 +28,10 @@ const DEFAULT_CODING_STANDARDS = `# Coding Standards
 - Maintain consistent directory structure
 `;
 
-export async function GET() {
-    try {
-        // Ensure directory exists
-        if (!existsSync(PREFERENCES_DIR)) {
-            await mkdir(PREFERENCES_DIR, { recursive: true });
-        }
+const { GET, POST } = createTextPreferenceRoute({
+    fileName: 'coding-standards.md',
+    defaultContent: DEFAULT_CODING_STANDARDS,
+    displayName: 'coding standards'
+});
 
-        // Check if file exists, create with default content if not
-        if (!existsSync(CODING_STANDARDS_FILE)) {
-            await writeFile(CODING_STANDARDS_FILE, DEFAULT_CODING_STANDARDS);
-
-            return new NextResponse(DEFAULT_CODING_STANDARDS);
-        }
-
-        const content = await readFile(CODING_STANDARDS_FILE, 'utf8');
-
-        return new NextResponse(content);
-    } catch (error) {
-        console.error('Error reading coding-standards.md:', error);
-
-        return new NextResponse('Error loading coding standards', { status: 500 });
-    }
-}
-
-export async function POST(request: NextRequest) {
-    try {
-        const content = await request.text();
-
-        // Ensure directory exists
-        if (!existsSync(PREFERENCES_DIR)) {
-            await mkdir(PREFERENCES_DIR, { recursive: true });
-        }
-
-        await writeFile(CODING_STANDARDS_FILE, content);
-
-        return new NextResponse('Coding standards saved successfully');
-    } catch (error) {
-        console.error('Error saving coding-standards.md:', error);
-
-        return new NextResponse('Error saving coding standards', { status: 500 });
-    }
-}
+export { GET, POST };

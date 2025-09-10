@@ -1,19 +1,10 @@
 'use client';
 
 import React from 'react';
-
-type AutomationSettings = {
-    automaticallyCreatePR: boolean;
-    doCodeReviewBeforeFinishing: boolean;
-    automaticTaskPicking: boolean;
-    baseBranch: string;
-    automaticallyMergePR: boolean;
-    mergeDecisionMode: 'always' | 'claude-decision';
-    claudeMergePrompt: string;
-};
+import type { AutomationSettings as AutomationSettingsType } from '@vibe-remote/shared-utils/automation-types';
 
 type AutomationStatusSummaryProps = {
-    readonly settings: AutomationSettings;
+    readonly settings: AutomationSettingsType;
 };
 
 export const AutomationStatusSummary: React.FC<AutomationStatusSummaryProps> = ({ settings }) => {

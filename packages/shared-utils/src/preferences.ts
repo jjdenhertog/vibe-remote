@@ -1,22 +1,11 @@
 import { existsSync, readFileSync } from 'node:fs';
+import type { AutomationSettings } from './automation-types.js';
+import { DEFAULT_AUTOMATION_SETTINGS } from './automation-types.js';
 
-export type AutomationPreferences = {
-    automaticallyCreatePR: boolean;
-    doCodeReviewBeforeFinishing: boolean;
-    automaticTaskPicking: boolean;
-    baseBranch: string;
-    autoMergePR?: boolean;
-    autoMergeDecisionMode?: 'always' | 'claude-decision';
-    autoMergePrompt?: string;
-};
+export type AutomationPreferences = AutomationSettings;
 
 export function readAutomationPreferences(): AutomationPreferences {
-    const defaultPreferences: AutomationPreferences = {
-        automaticallyCreatePR: false,
-        doCodeReviewBeforeFinishing: false,
-        automaticTaskPicking: false,
-        baseBranch: 'main'
-    };
+    const defaultPreferences: AutomationPreferences = DEFAULT_AUTOMATION_SETTINGS;
 
     const preferencesPath = '/workspace/data/preferences/automations.json';
 
@@ -28,24 +17,11 @@ export function readAutomationPreferences(): AutomationPreferences {
         const fileContent = readFileSync(preferencesPath, 'utf8');
         const preferences = JSON.parse(fileContent) as Partial<AutomationPreferences>;
 
+        // Merge with defaults to ensure all properties are present
         const result: AutomationPreferences = {
-            automaticallyCreatePR: preferences.automaticallyCreatePR ?? defaultPreferences.automaticallyCreatePR,
-            doCodeReviewBeforeFinishing: preferences.doCodeReviewBeforeFinishing ?? defaultPreferences.doCodeReviewBeforeFinishing,
-            automaticTaskPicking: preferences.automaticTaskPicking ?? defaultPreferences.automaticTaskPicking,
-            baseBranch: preferences.baseBranch ?? defaultPreferences.baseBranch
+            ...defaultPreferences,
+            ...preferences
         };
-
-        if (preferences.autoMergePR !== undefined) {
-            result.autoMergePR = preferences.autoMergePR;
-        }
-        
-        if (preferences.autoMergeDecisionMode !== undefined) {
-            result.autoMergeDecisionMode = preferences.autoMergeDecisionMode;
-        }
-
-        if (preferences.autoMergePrompt !== undefined) {
-            result.autoMergePrompt = preferences.autoMergePrompt;
-        }
 
         return result;
     } catch (error) {

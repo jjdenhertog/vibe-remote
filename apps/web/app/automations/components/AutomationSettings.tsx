@@ -3,21 +3,12 @@
 import React from 'react';
 import { ToggleLeft, ToggleRight, CheckCircle2, GitPullRequest, Settings, GitBranch, GitMerge, Sparkles } from 'lucide-react';
 import type { BranchInfo, ProjectBranchesResponse } from '@vibe-remote/vibe-kanban-api/types/api';
+import type { AutomationSettings as AutomationSettingsType } from '@vibe-remote/shared-utils/automation-types';
 import { ClaudePromptEditor } from './ClaudePromptEditor';
 import { AutomationStatusSummary } from './AutomationStatusSummary';
 
-type AutomationSettings = {
-    automaticallyCreatePR: boolean;
-    doCodeReviewBeforeFinishing: boolean;
-    automaticTaskPicking: boolean;
-    baseBranch: string;
-    automaticallyMergePR: boolean;
-    mergeDecisionMode: 'always' | 'claude-decision';
-    claudeMergePrompt: string;
-};
-
 type AutomationSettingsProps = {
-    readonly settings: AutomationSettings;
+    readonly settings: AutomationSettingsType;
     readonly branchData: ProjectBranchesResponse | null;
     readonly branchesLoading: boolean;
     readonly showPromptEditor: boolean;
