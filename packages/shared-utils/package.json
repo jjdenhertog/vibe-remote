@@ -7,6 +7,14 @@
     "./preferences": {
       "import": "./dist/preferences.js",
       "types": "./dist/preferences.d.ts"
+    },
+    "./prompt-utils": {
+      "import": "./dist/prompt-utils.js",
+      "types": "./dist/prompt-utils.d.ts"
+    },
+    "./preference-context": {
+      "import": "./dist/preference-context.js",
+      "types": "./dist/preference-context.d.ts"
     }
   },
   "files": [

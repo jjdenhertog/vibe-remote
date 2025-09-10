@@ -5,11 +5,10 @@ import { existsSync, mkdtempSync, readFileSync, unlinkSync, writeFileSync } from
 import { dirname, join } from 'node:path';
 
 import { runClaudeCommand } from './command/runClaudeCommand';
-import { prependContextToPrompt } from './utils/prependContextToPrompt';
 import { readAutomationPreferences } from './utils/readAutomationPreferences';
-import { readPreferenceFiles } from './utils/readPreferenceFiles';
 import { readPRPromptTemplate } from './utils/readPRPromptTemplate';
 import { readStdin } from './utils/readStdin';
+import { prependContextToPrompt, readPreferenceFiles } from '@vibe-remote/shared-utils/prompt-utils';
 
 function createTempPromptFile(): string {
     return `${mkdtempSync(join(process.cwd(), 'claude-flow-prompt.'))}.md`;
