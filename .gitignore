@@ -48,10 +48,8 @@ temp/
 # Claude
 .claude
 
+
 # Claude Flow generated files
-.claude-flow
-CLAUDE.md
-memory
 .claude/settings.local.json
 .mcp.json
 claude-flow.config.json
@@ -75,4 +73,3 @@ claude-flow
 claude-flow.bat
 claude-flow.ps1
 hive-mind-prompt-*.txt
-.claude-flow/

@@ -1,17 +1,7 @@
-import { existsSync, readFileSync } from "node:fs";
+import { readPromptTemplate } from '@vibe-remote/shared-utils/prompt-utils';
 
 export function readPRPromptTemplate(): string | null {
     const prPromptPath = '/workspace/data/preferences/pr-prompt.md';
 
-    if (!existsSync(prPromptPath)) {
-        return null;
-    }
-
-    try {
-        return readFileSync(prPromptPath, 'utf8');
-    } catch (error) {
-        console.warn(`Warning: Could not read pr-prompt.md: ${String(error)}`);
-
-        return null;
-    }
+    return readPromptTemplate(prPromptPath, 'pr-prompt.md');
 }
