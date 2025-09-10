@@ -5,7 +5,7 @@
     "apps/*",
     "packages/*"
   ],
-  "version": "7.0.103",
+  "version": "7.0.104",
   "description": "Remote AI development environment with Vibe-Kanban task management and Claude AI integration",
   "main": "index.js",
   "scripts": {
