@@ -48,18 +48,6 @@ temp/
 # Claude
 .claude
 
-
-
-
-
-
-<<<<<<< HEAD
-
-
-
-
-=======
->>>>>>> 11e9216c3cba06cb1b76d72219f91f2ba67d7bf2
 # Claude Flow generated files
 .claude-flow
 CLAUDE.md
@@ -87,3 +75,4 @@ claude-flow
 claude-flow.bat
 claude-flow.ps1
 hive-mind-prompt-*.txt
+.claude-flow/
