@@ -6,7 +6,7 @@ export async function getInfo(containerRef: string): Promise<ContainerInfo> {
         ref: containerRef
     });
     
-    const response = await makeRequest<ContainerInfo>(`/api/containers/info?${queryParams}`, {
+    const response = await makeRequest<ContainerInfo>(`/api/containers/info?${queryParams.toString()}`, {
         method: 'GET'
     });
 

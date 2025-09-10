@@ -80,13 +80,23 @@ async function runClaudeTaskSelection(analysis: ProjectAnalysis, projectId: stri
         claude.stdout.on('data', (data) => { process.stdout.write(data); });
         claude.stderr.on('data', (data) => { process.stderr.write(data); });
 
-        claude.on('close', (code) => {
-            // Clean up temp file
-            try {
-                unlinkSync(tempPromptPath);
-            } catch (error) {
-                console.error('[TaskPicker] Failed to clean up temp file:', error);
+        let isCleanedUp = false;
+        const cleanupTempFile = () => {
+            if (!isCleanedUp) {
+                try {
+                    unlinkSync(tempPromptPath);
+                    isCleanedUp = true;
+                } catch (error) {
+                    // Only log error if it's not ENOENT (file already deleted)
+                    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+                        console.error('[TaskPicker] Failed to clean up temp file:', error);
+                    }
+                }
             }
+        };
+
+        claude.on('close', (code) => {
+            cleanupTempFile();
 
             if (code === 0) {
                 console.log('[TaskPicker] Claude task selection completed successfully');
@@ -97,12 +107,7 @@ async function runClaudeTaskSelection(analysis: ProjectAnalysis, projectId: stri
         });
 
         claude.on('error', (error) => {
-            // Clean up temp file on error
-            try {
-                unlinkSync(tempPromptPath);
-            } catch (cleanupError) {
-                console.error('[TaskPicker] Failed to clean up temp file:', cleanupError);
-            }
+            cleanupTempFile();
             reject(error);
         });
     });

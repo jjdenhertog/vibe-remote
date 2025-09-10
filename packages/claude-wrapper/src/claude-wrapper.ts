@@ -63,14 +63,7 @@ function runClaudeFlowInit(): Promise<void> {
     });
 }
 
-async function executeCodeReviewIfEnabled(originalPrompt: string, additionalArgs: string[] = []): Promise<void> {
-    const automationPreferences = readAutomationPreferences();
-
-    if (!automationPreferences.doCodeReviewBeforeFinishing) {
-        console.error('⏭️ Code review skipped (doCodeReviewBeforeFinishing is disabled in preferences)');
-
-        return;
-    }
+async function executeCodeReview(originalPrompt: string, additionalArgs: string[] = []): Promise<void> {
 
     const prPromptTemplate = readPRPromptTemplate();
     if (!prPromptTemplate) {
@@ -127,6 +120,12 @@ async function main(): Promise<void> {
             const templateContent = readFileSync(templatePath, 'utf8');
             const finalContent = templateContent.replace(/%REPLACE_WITH_PROMPT%/g, enhancedPrompt);
             writeFileSync(promptFile, finalContent);
+
+            const automationPreferences = readAutomationPreferences();
+            if (automationPreferences.doCodeReviewBeforeFinishing) 
+                await executeCodeReview(prompt, additionalArgs);
+
+
         } else if (usePlan) {
             // Use claude-plan-prompt.md template only when --plan is specified and not resuming
             const currentDir = dirname(new URL(import.meta.url).pathname);
@@ -135,14 +134,10 @@ async function main(): Promise<void> {
             const templateContent = readFileSync(templatePath, 'utf8');
             const finalContent = templateContent.replace(/%REPLACE_WITH_PROMPT%/g, enhancedPrompt);
             writeFileSync(promptFile, finalContent);
-        } 
-        
+        }
+
         await runClaudeCommand(promptFile, additionalArgs);
 
-        // Skip code review when --plan is used
-        if (!usePlan) {
-            await executeCodeReviewIfEnabled(prompt, additionalArgs);
-        }
 
     } catch (error) {
         console.error('Error:', error);
