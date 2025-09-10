@@ -5,8 +5,8 @@ export type AutomationPreferences = {
     doCodeReviewBeforeFinishing: boolean;
     automaticTaskPicking: boolean;
     baseBranch: string;
-    autoMergePR: boolean;
-    autoMergeDecisionMode: 'always' | 'claude-decision';
+    autoMergePR?: boolean;
+    autoMergeDecisionMode?: 'always' | 'claude-decision';
     autoMergePrompt?: string;
 };
 
@@ -15,9 +15,7 @@ export function readAutomationPreferences(): AutomationPreferences {
         automaticallyCreatePR: false,
         doCodeReviewBeforeFinishing: false,
         automaticTaskPicking: false,
-        baseBranch: 'main',
-        autoMergePR: false,
-        autoMergeDecisionMode: 'claude-decision'
+        baseBranch: 'main'
     };
 
     const preferencesPath = '/workspace/data/preferences/automations.json';
@@ -34,10 +32,16 @@ export function readAutomationPreferences(): AutomationPreferences {
             automaticallyCreatePR: preferences.automaticallyCreatePR ?? defaultPreferences.automaticallyCreatePR,
             doCodeReviewBeforeFinishing: preferences.doCodeReviewBeforeFinishing ?? defaultPreferences.doCodeReviewBeforeFinishing,
             automaticTaskPicking: preferences.automaticTaskPicking ?? defaultPreferences.automaticTaskPicking,
-            baseBranch: preferences.baseBranch ?? defaultPreferences.baseBranch,
-            autoMergePR: preferences.autoMergePR ?? defaultPreferences.autoMergePR,
-            autoMergeDecisionMode: preferences.autoMergeDecisionMode ?? defaultPreferences.autoMergeDecisionMode
+            baseBranch: preferences.baseBranch ?? defaultPreferences.baseBranch
         };
+
+        if (preferences.autoMergePR !== undefined) {
+            result.autoMergePR = preferences.autoMergePR;
+        }
+        
+        if (preferences.autoMergeDecisionMode !== undefined) {
+            result.autoMergeDecisionMode = preferences.autoMergeDecisionMode;
+        }
 
         if (preferences.autoMergePrompt !== undefined) {
             result.autoMergePrompt = preferences.autoMergePrompt;
