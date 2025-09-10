@@ -1,7 +1,12 @@
 {
   "startTime": 1757510761355,
+<<<<<<< HEAD
   "totalTasks": 5,
   "successfulTasks": 5,
+=======
+  "totalTasks": 1,
+  "successfulTasks": 1,
+>>>>>>> 11e9216c3cba06cb1b76d72219f91f2ba67d7bf2
   "failedTasks": 0,
   "totalAgents": 0,
   "activeAgents": 0,
