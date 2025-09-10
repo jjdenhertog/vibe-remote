@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Editor } from '@monaco-editor/react';
 import { enqueueSnackbar } from 'notistack';
-import { Save, ArrowLeft, ToggleLeft, ToggleRight, CheckCircle2, GitPullRequest, Settings, GitBranch } from 'lucide-react';
+import { Save, ArrowLeft, ToggleLeft, ToggleRight, CheckCircle2, GitPullRequest, Settings, GitBranch, GitMerge, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import type { BranchInfo, ProjectBranchesResponse } from '@vibe-remote/vibe-kanban-api/types/api';
 
@@ -12,6 +12,9 @@ type AutomationSettings = {
     doCodeReviewBeforeFinishing: boolean;
     automaticTaskPicking: boolean;
     baseBranch: string;
+    automaticallyMergePR: boolean;
+    mergeDecisionMode: 'always' | 'claude-decision';
+    claudeMergePrompt: string;
 };
 
 
@@ -20,7 +23,10 @@ export const AutomationsPage = () => {
         automaticallyCreatePR: false,
         doCodeReviewBeforeFinishing: false,
         automaticTaskPicking: false,
-        baseBranch: 'main'
+        baseBranch: 'main',
+        automaticallyMergePR: false,
+        mergeDecisionMode: 'always',
+        claudeMergePrompt: 'Review this pull request and decide if it should be automatically merged.\n\nConsider:\n- Code quality and test coverage\n- Potential breaking changes\n- Security implications\n- Performance impact\n\nRespond with either "MERGE" or "DO NOT MERGE" followed by your reasoning.'
     });
     const [jsonValue, setJsonValue] = useState('');
     const [loading, setLoading] = useState(true);
@@ -28,6 +34,7 @@ export const AutomationsPage = () => {
     const [jsonError, setJsonError] = useState<string | null>(null);
     const [branchData, setBranchData] = useState<ProjectBranchesResponse | null>(null);
     const [branchesLoading, setBranchesLoading] = useState(false);
+    const [showPromptEditor, setShowPromptEditor] = useState(false);
 
     const loadSettings = useCallback(async () => {
         try {
@@ -36,9 +43,22 @@ export const AutomationsPage = () => {
 
             try {
                 const parsed = JSON.parse(data);
-                setSettings(parsed);
-                setJsonValue(JSON.stringify(parsed, null, 2));
+                // Ensure new fields have defaults if not present
+                const mergedSettings = {
+                    automaticallyCreatePR: false,
+                    doCodeReviewBeforeFinishing: false,
+                    automaticTaskPicking: false,
+                    baseBranch: 'main',
+                    automaticallyMergePR: false,
+                    mergeDecisionMode: 'always' as const,
+                    claudeMergePrompt: 'Review this pull request and decide if it should be automatically merged.\n\nConsider:\n- Code quality and test coverage\n- Potential breaking changes\n- Security implications\n- Performance impact\n\nRespond with either "MERGE" or "DO NOT MERGE" followed by your reasoning.',
+                    ...parsed
+                };
+                setSettings(mergedSettings);
+                setJsonValue(JSON.stringify(mergedSettings, null, 2));
                 setJsonError(null);
+                // Set prompt editor visibility based on loaded settings
+                setShowPromptEditor(mergedSettings.mergeDecisionMode === 'claude-decision');
             } catch (parseError) {
                 console.error('Error parsing automation settings:', parseError);
                 setJsonValue(data);
@@ -151,6 +171,36 @@ export const AutomationsPage = () => {
         handleBranchChange(e.target.value);
     }, [handleBranchChange]);
 
+    const handleAutoMergeToggle = useCallback(() => {
+        handleToggle('automaticallyMergePR');
+    }, [handleToggle]);
+
+    const handleMergeDecisionModeChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+        const mode = e.target.value as 'always' | 'claude-decision';
+        const newSettings = {
+            ...settings,
+            mergeDecisionMode: mode
+        };
+        setSettings(newSettings);
+        setJsonValue(JSON.stringify(newSettings, null, 2));
+        setJsonError(null);
+        setShowPromptEditor(mode === 'claude-decision');
+    }, [settings]);
+
+    const handleClaudePromptChange = useCallback((value: string | undefined = '') => {
+        const newSettings = {
+            ...settings,
+            claudeMergePrompt: value
+        };
+        setSettings(newSettings);
+        setJsonValue(JSON.stringify(newSettings, null, 2));
+        setJsonError(null);
+    }, [settings]);
+
+    const handlePromptEditorToggle = useCallback(() => {
+        setShowPromptEditor(!showPromptEditor);
+    }, [showPromptEditor]);
+
     const handleSaveClick = useCallback(() => {
         handleSave().catch(console.error);
     }, [handleSave]);
@@ -231,6 +281,96 @@ export const AutomationsPage = () => {
                                     </button>
                                 </div>
                             </div>
+
+                            {/* Automatically Merge PR */}
+                            {!!settings.automaticallyCreatePR && (
+                                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 ml-8 border-l-4 border-blue-500">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center">
+                                            <GitMerge className="w-5 h-5 text-purple-600 dark:text-purple-400 mr-3" />
+                                            <div>
+                                                <h3 className="font-medium text-gray-900 dark:text-white">
+                                                    Automatically Merge PR
+                                                </h3>
+                                                <p className="text-sm text-gray-600 dark:text-gray-300">
+                                                    Automatically merge the PR after creation
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={handleAutoMergeToggle}
+                                            className={`p-1 rounded-full transition-colors ${
+                                                settings.automaticallyMergePR 
+                                                    ? 'text-green-600 hover:text-green-700' 
+                                                    : 'text-gray-400 hover:text-gray-500'
+                                            }`}
+                                        >
+                                            {settings.automaticallyMergePR ? (
+                                                <ToggleRight className="w-8 h-8" />
+                                            ) : (
+                                                <ToggleLeft className="w-8 h-8" />
+                                            )}
+                                        </button>
+                                    </div>
+
+                                    {/* Merge Decision Mode */}
+                                    {!!settings.automaticallyMergePR && (
+                                        <div className="mt-4 pl-8">
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                                Merge Decision Mode
+                                            </label>
+                                            <select
+                                                value={settings.mergeDecisionMode}
+                                                onChange={handleMergeDecisionModeChange}
+                                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                            >
+                                                <option value="always">Always Merge</option>
+                                                <option value="claude-decision">Claude Decision</option>
+                                            </select>
+
+                                            {/* Claude Prompt Editor Toggle */}
+                                            {settings.mergeDecisionMode === 'claude-decision' && (
+                                                <div className="mt-3">
+                                                    <button
+                                                        type="button"
+                                                        onClick={handlePromptEditorToggle}
+                                                        className="inline-flex items-center gap-2 text-sm text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
+                                                    >
+                                                        <Sparkles className="w-4 h-4" />
+                                                        {showPromptEditor ? 'Hide' : 'Edit'} Claude Prompt
+                                                    </button>
+
+                                                    {/* Claude Prompt Editor */}
+                                                    {!!showPromptEditor && (
+                                                        <div className="mt-3">
+                                                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+                                                                Claude will use this prompt to decide whether to merge
+                                                            </label>
+                                                            <div className="h-[200px] border rounded-lg overflow-hidden">
+                                                                <Editor
+                                                                    value={settings.claudeMergePrompt}
+                                                                    language="markdown"
+                                                                    theme="vs-dark"
+                                                                    onChange={handleClaudePromptChange}
+                                                                    options={{
+                                                                        fontSize: 12,
+                                                                        wordWrap: 'on',
+                                                                        minimap: { enabled: false },
+                                                                        scrollBeyondLastLine: false,
+                                                                        automaticLayout: true,
+                                                                        lineNumbers: 'off',
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
 
                             {/* Code Review Before Finishing */}
                             <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
@@ -353,6 +493,14 @@ export const AutomationsPage = () => {
                                             Auto PR Creation: {settings.automaticallyCreatePR ? 'Enabled' : 'Disabled'}
                                         </span>
                                     </div>
+                                    {!!settings.automaticallyCreatePR && !!settings.automaticallyMergePR && (
+                                        <div className="flex items-center pl-4">
+                                            <span className="w-2 h-2 rounded-full mr-2 bg-purple-500" />
+                                            <span className="text-blue-800 dark:text-blue-200">
+                                                Auto Merge: {settings.mergeDecisionMode === 'always' ? 'Always' : 'Claude Decision'}
+                                            </span>
+                                        </div>
+                                    )}
                                     <div className="flex items-center">
                                         {!!settings.doCodeReviewBeforeFinishing && (
                                             <span className="w-2 h-2 rounded-full mr-2 bg-green-500" />

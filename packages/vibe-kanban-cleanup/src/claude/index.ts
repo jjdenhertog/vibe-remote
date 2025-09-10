@@ -1,0 +1,1 @@
+export { runAutoMerge } from './runAutoMerge';
