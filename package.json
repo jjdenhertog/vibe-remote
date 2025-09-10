@@ -5,11 +5,11 @@
     "apps/*",
     "packages/*"
   ],
-  "version": "7.0.99",
+  "version": "7.0.100",
   "description": "Remote AI development environment with Vibe-Kanban task management and Claude AI integration",
   "main": "index.js",
   "scripts": {
-    "build:packages": "tsc --build packages/shared-utils packages/vibe-kanban-api packages/claude-wrapper && pnpm --filter=@vibe-remote/vibe-kanban-cleanup run build && pnpm --filter=@vibe-remote/vibe-kanban-taskpicker run build",
+    "build:packages": "tsc --build packages/shared-utils packages/vibe-kanban-api && pnpm --filter=@vibe-remote/claude-wrapper run build && pnpm --filter=@vibe-remote/vibe-kanban-cleanup run build && pnpm --filter=@vibe-remote/vibe-kanban-taskpicker run build",
     "build:web": "pnpm --filter=@vibe-remote/web run build",
     "build": "pnpm run build:packages && pnpm run build:web",
     "build:clean": "tsc --build --clean && pnpm -r --if-present run clean && rm -rf dist build lib *.tsbuildinfo tsconfig.tsbuildinfo",
