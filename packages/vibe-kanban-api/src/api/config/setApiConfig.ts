@@ -1,7 +1,7 @@
 import type { ApiConfig } from '../../types/api';
 
 let globalConfig: ApiConfig = {
-    baseUrl: 'http://localhost:8080',
+    baseUrl: 'http://localhost:9091',
     timeout: 10_000
 };
 

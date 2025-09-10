@@ -1,9 +1,10 @@
-import { spawn } from 'node:child_process';
-import { readFileSync, writeFileSync, unlinkSync, mkdtempSync } from 'node:fs';
-import { dirname, join } from 'node:path';
 import { listProjects } from '@vibe-remote/vibe-kanban-api/api/projects/listProjects';
 import { listTasks } from '@vibe-remote/vibe-kanban-api/api/tasks/listTasks';
-import { analyzeProject, type ProjectAnalysis } from '@vibe-remote/vibe-kanban-api/utils/taskAnalyzer';
+import { analyzeProject, ProjectAnalysis } from '@vibe-remote/vibe-kanban-api/utils/taskAnalyzer';
+import { spawn } from 'node:child_process';
+import { mkdtempSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+
 import type { Task } from '@vibe-remote/vibe-kanban-api/types/api';
 import { readAutomationPreferences } from '../utils/readAutomationPreferences';
 
@@ -42,7 +43,7 @@ async function runClaudeTaskSelection(analysis: ProjectAnalysis, projectId: stri
     return new Promise((resolvePromise, reject) => {
         // Find the task picker prompt template (same pattern as claude-wrapper)
         const currentDir = dirname(new URL(import.meta.url).pathname);
-        const templatePath = join(currentDir, '..', '..', 'templates', 'task-picker-prompt.md');
+        const templatePath = join(currentDir, 'vibe-kanban-taskpicker-dist', 'templates', 'task-picker-prompt.md');
 
         let promptTemplate: string;
 
@@ -65,16 +66,13 @@ async function runClaudeTaskSelection(analysis: ProjectAnalysis, projectId: stri
             .replace('{{TASK_DATA}}', taskDataJson)
             .replace('{{BASE_BRANCH}}', preferences.baseBranch);
 
-        // const tempPromptPath = `/tmp/task-picker-prompt-${Date.now()}.md`;
         const tempPromptPath = `${mkdtempSync(join(process.cwd(), 'task-picker-prompt.'))}.md`;
         writeFileSync(tempPromptPath, prompt);
 
         // Prepare Claude arguments
         const claudeArgs = [
             '-p', `Read and execute the instructions in this file: ${tempPromptPath}`,
-            '--verbose',
-            '--dangerously-skip-permissions',
-            '--output-format=stream-json'
+            '--dangerously-skip-permissions'
         ];
 
         console.log('[TaskPicker] Starting Claude task selection...');

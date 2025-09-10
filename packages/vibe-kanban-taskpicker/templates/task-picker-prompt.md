@@ -44,7 +44,7 @@ curl -X POST \
     "task_id": "<selected-task-id>",
     "executor_profile_id": {
       "executor": "CLAUDE_CODE",
-      "variant": null
+      "variant": "VIBE_FLOW"
     },
     "base_branch": "{{BASE_BRANCH}}"
   }' \

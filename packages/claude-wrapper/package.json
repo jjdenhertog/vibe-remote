@@ -5,20 +5,20 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/claude-wrapper.js",
+      "import": "./dist/claude-wrapper.mjs",
       "types": "./dist/claude-wrapper.d.ts"
     }
   },
   "bin": {
-    "claude-wrapper": "./dist/claude-wrapper.js"
+    "claude-wrapper": "./dist/claude-wrapper.mjs"
   },
   "files": [
     "dist",
     "templates"
   ],
   "scripts": {
-    "build": "tsc && cp -r templates dist/",
-    "build:watch": "tsc --watch",
+    "build": "tsup",
+    "build:watch": "tsup --watch",
     "clean": "rm -rf dist",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
@@ -38,5 +38,8 @@
   },
   "engines": {
     "node": ">=20.0.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.0"
   }
 }

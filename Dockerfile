@@ -115,13 +115,14 @@ RUN mkdir -p /workspace/credentials /workspace/project /workspace/data /workspac
     /home/developer/.config \
     && chown -R developer:developer /workspace /home/developer
 
-# Copy built artifacts from build stage
-COPY --from=builder /build/packages/claude-wrapper/dist/ /scripts/claude-wrapper-dist/
+# Copy built artifacts from build stage - now we only need the bundled executables
+COPY --from=builder /build/packages/claude-wrapper/dist/claude-wrapper.mjs /scripts/claude-wrapper.mjs
 COPY --from=builder /build/packages/claude-wrapper/templates/ /scripts/claude-wrapper-dist/templates/
 
-COPY --from=builder /build/packages/vibe-kanban-cleanup/dist/ /scripts/vibe-kanban-cleanup-dist/
+COPY --from=builder /build/packages/vibe-kanban-cleanup/dist/vibe-kanban-cleanup.mjs /scripts/vibe-kanban-cleanup.mjs
+COPY --from=builder /build/packages/vibe-kanban-cleanup/dist/start-task-command.mjs /scripts/start-task-command.mjs
 
-COPY --from=builder /build/packages/vibe-kanban-taskpicker/dist/ /scripts/vibe-kanban-taskpicker-dist/
+COPY --from=builder /build/packages/vibe-kanban-taskpicker/dist/vibe-kanban-taskpicker.mjs /scripts/vibe-kanban-taskpicker.mjs
 COPY --from=builder /build/packages/vibe-kanban-taskpicker/templates/ /scripts/vibe-kanban-taskpicker-dist/templates/
 # Copy Next.js standalone app (root includes the full monorepo structure)  
 COPY --from=builder /build/apps/web/.next/standalone/ /workspace/vibe-web/
@@ -136,11 +137,12 @@ COPY --chown=root:root scripts/ /scripts/
 COPY --chown=root:root docker-entrypoint.sh /docker-entrypoint.sh
 
 # Make scripts executable and create symlinks for user commands
-RUN chmod +x /docker-entrypoint.sh /scripts/*.sh /scripts/claude-wrapper-dist/*.js /scripts/vibe-kanban-cleanup-dist/*.js /scripts/vibe-kanban-taskpicker-dist/*.js && \
+RUN chmod +x /docker-entrypoint.sh /scripts/*.sh /scripts/*.mjs && \
     ln -s /scripts/init-project.sh /usr/local/bin/init-project && \
-    ln -s /scripts/claude-wrapper-dist/claude-wrapper.js /usr/local/bin/claude-wrapper && \
-    ln -s /scripts/vibe-kanban-cleanup-dist/vibe-kanban-cleanup.js /usr/local/bin/vibe-kanban-cleanup && \
-    ln -s /scripts/vibe-kanban-taskpicker-dist/index.js /usr/local/bin/vibe-kanban-taskpicker && \
+    ln -s /scripts/claude-wrapper.mjs /usr/local/bin/claude-wrapper && \
+    ln -s /scripts/vibe-kanban-cleanup.mjs /usr/local/bin/vibe-kanban-cleanup && \
+    ln -s /scripts/start-task-command.mjs /usr/local/bin/vibe-start-task && \
+    ln -s /scripts/vibe-kanban-taskpicker.mjs /usr/local/bin/vibe-kanban-taskpicker && \
     ln -s /scripts/setup-verify.sh /usr/local/bin/setup-verify && \
     ln -s /scripts/setup-storage-credentials.sh /usr/local/bin/setup-storage-credentials && \
     ln -s /scripts/setup-storage-data.sh /usr/local/bin/setup-storage-data && \

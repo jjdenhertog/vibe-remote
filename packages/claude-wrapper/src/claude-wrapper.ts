@@ -1,25 +1,44 @@
 #!/usr/bin/env node
 
-import { runClaudeCommand } from './command/runClaudeCommand';
-import { readPRPromptTemplate } from './utils/readPRPromptTemplate';
-import { readAutomationPreferences } from './utils/readAutomationPreferences';
-import { prependContextToPrompt } from './utils/prependContextToPrompt';
-import { readPreferenceFiles } from './utils/readPreferenceFiles';
-import { readStdin } from './utils/readStdin';
+import { spawn } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { spawn } from 'node:child_process';
+
+import { runClaudeCommand } from './command/runClaudeCommand';
+import { prependContextToPrompt } from './utils/prependContextToPrompt';
+import { readAutomationPreferences } from './utils/readAutomationPreferences';
+import { readPreferenceFiles } from './utils/readPreferenceFiles';
+import { readPRPromptTemplate } from './utils/readPRPromptTemplate';
+import { readStdin } from './utils/readStdin';
 
 function createTempPromptFile(): string {
     return `${mkdtempSync(join(process.cwd(), 'claude-flow-prompt.'))}.md`;
 }
 
-function parseArgs(): { useFlow: boolean; usePlan: boolean } {
-    const args = new Set(process.argv.slice(2));
+function parseArgs(): { useFlow: boolean; usePlan: boolean; isResume: boolean; additionalArgs: string[] } {
+    const args = process.argv.slice(2);
+    const useFlow = args.includes('--flow');
+    const usePlan = args.includes('--plan');
+
+    // Check if this is a session resume - Claude automatically detects this,
+    // but we can check for common resume indicators
+    const isResume = args.some(arg =>
+        arg.includes('--session-id') ||
+        arg.includes('--continue') ||
+        arg.includes('--resume') ||
+        // Check if there's an existing conversation context in the current directory
+        existsSync('.claude-conversation') ||
+        existsSync('.claude-session')
+    );
+
+    // Filter out --flow and --plan, pass everything else to claude
+    const additionalArgs = args.filter(arg => arg !== '--flow' && arg !== '--plan');
 
     return {
-        useFlow: args.has('--flow'),
-        usePlan: args.has('--plan')
+        useFlow,
+        usePlan,
+        isResume,
+        additionalArgs
     };
 }
 
@@ -44,7 +63,7 @@ function runClaudeFlowInit(): Promise<void> {
     });
 }
 
-async function executeCodeReviewIfEnabled(originalPrompt: string): Promise<void> {
+async function executeCodeReviewIfEnabled(originalPrompt: string, additionalArgs: string[] = []): Promise<void> {
     const automationPreferences = readAutomationPreferences();
 
     if (!automationPreferences.doCodeReviewBeforeFinishing) {
@@ -66,7 +85,7 @@ async function executeCodeReviewIfEnabled(originalPrompt: string): Promise<void>
     const codeReviewPromptFile = createTempPromptFile();
 
     writeFileSync(codeReviewPromptFile, codeReviewPrompt);
-    await runClaudeCommand(codeReviewPromptFile);
+    await runClaudeCommand(codeReviewPromptFile, additionalArgs);
     console.log('✅ Code review completed');
 
     if (existsSync(codeReviewPromptFile))
@@ -77,8 +96,8 @@ async function main(): Promise<void> {
     let promptFile = '';
 
     try {
-        const { useFlow, usePlan } = parseArgs();
-        
+        const { useFlow, usePlan, isResume, additionalArgs } = parseArgs();
+
         let prompt = '';
         if (!process.stdin.isTTY)
             prompt = await readStdin();
@@ -93,37 +112,36 @@ async function main(): Promise<void> {
 
         promptFile = createTempPromptFile();
 
-        if (useFlow) {
-            // Run claude-flow init before processing when --flow is used
+        if (isResume) {
+            writeFileSync(promptFile, prompt);
+        } else if (useFlow) {
+            // Run claude-flow init before processing when --flow is used (only for new sessions)
             // eslint-disable-next-line no-console
             console.log('🔄 Initializing claude-flow...');
             await runClaudeFlowInit();
 
-            // Use claude-flow-prompt.md template only when --flow is specified
+            // Use claude-flow-prompt.md template only when --flow is specified and not resuming
             const currentDir = dirname(new URL(import.meta.url).pathname);
-            const scriptDir = join(currentDir, 'templates');
+            const scriptDir = join(currentDir, 'claude-wrapper-dist', 'templates');
             const templatePath = join(scriptDir, 'claude-flow-prompt.md');
             const templateContent = readFileSync(templatePath, 'utf8');
             const finalContent = templateContent.replace(/%REPLACE_WITH_PROMPT%/g, enhancedPrompt);
             writeFileSync(promptFile, finalContent);
         } else if (usePlan) {
-            // Use claude-plan-prompt.md template when --plan is specified
+            // Use claude-plan-prompt.md template only when --plan is specified and not resuming
             const currentDir = dirname(new URL(import.meta.url).pathname);
-            const scriptDir = join(currentDir, 'templates');
+            const scriptDir = join(currentDir, 'claude-wrapper-dist', 'templates');
             const templatePath = join(scriptDir, 'claude-plan-prompt.md');
             const templateContent = readFileSync(templatePath, 'utf8');
             const finalContent = templateContent.replace(/%REPLACE_WITH_PROMPT%/g, enhancedPrompt);
             writeFileSync(promptFile, finalContent);
-        } else {
-            // Without --flow or --plan, write the enhanced prompt directly without template
-            writeFileSync(promptFile, enhancedPrompt);
-        }
-
-        await runClaudeCommand(promptFile);
+        } 
         
+        await runClaudeCommand(promptFile, additionalArgs);
+
         // Skip code review when --plan is used
         if (!usePlan) {
-            await executeCodeReviewIfEnabled(prompt);
+            await executeCodeReviewIfEnabled(prompt, additionalArgs);
         }
 
     } catch (error) {

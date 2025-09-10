@@ -5,24 +5,20 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    },
-    "./cleanup": {
-      "import": "./dist/vibe-kanban-cleanup.js",
+      "import": "./dist/vibe-kanban-cleanup.mjs",
       "types": "./dist/vibe-kanban-cleanup.d.ts"
     }
   },
   "bin": {
-    "vibe-kanban-cleanup": "./dist/vibe-kanban-cleanup.js",
-    "vibe-start-task": "./dist/commands/startTaskCommand.js"
+    "vibe-kanban-cleanup": "./dist/vibe-kanban-cleanup.mjs",
+    "vibe-start-task": "./dist/start-task-command.mjs"
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
-    "build:watch": "tsc --watch",
+    "build": "tsup",
+    "build:watch": "tsup --watch",
     "clean": "rm -rf dist",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
@@ -38,13 +34,16 @@
     "typescript"
   ],
   "dependencies": {
-    "@vibe-remote/vibe-kanban-api": "workspace:*",
-    "@vibe-remote/shared-utils": "workspace:*"
+    "@vibe-remote/shared-utils": "workspace:*",
+    "@vibe-remote/vibe-kanban-api": "workspace:*"
   },
   "peerDependencies": {
     "typescript": ">=5.0.0"
   },
   "engines": {
     "node": ">=20.0.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.0"
   }
 }

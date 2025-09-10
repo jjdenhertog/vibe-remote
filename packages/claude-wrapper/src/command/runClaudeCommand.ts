@@ -1,13 +1,23 @@
 import { spawn } from 'node:child_process';
 
-export function runClaudeCommand(promptFile: string): Promise<void> {
+export function runClaudeCommand(promptFile: string, additionalArgs: string[] = []): Promise<void> {
     return new Promise((resolve, reject) => {
-        const claude = spawn('claude', [
+        const baseArgs = [
             '-p', `Read and execute the this file ${promptFile}`,
             '--dangerously-skip-permissions',
             '--verbose',
             '--output-format=stream-json'
-        ], {
+        ];
+        
+        // Filter out base args from additionalArgs to prevent conflicts
+        const baseArgKeys = new Set(['-p', '--dangerously-skip-permissions', '--verbose', '--output-format']);
+        const filteredAdditionalArgs = additionalArgs.filter(arg => {
+            const [argKey] = arg.split('=');
+
+            return !baseArgKeys.has(arg) && !baseArgKeys.has(argKey ?? '');
+        });
+        
+        const claude = spawn('claude', [...baseArgs, ...filteredAdditionalArgs], {
             stdio: ['inherit', 'pipe', 'pipe']
         });
 

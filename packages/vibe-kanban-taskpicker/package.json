@@ -5,28 +5,28 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "import": "./dist/vibe-kanban-taskpicker.mjs",
+      "types": "./dist/vibe-kanban-taskpicker.d.ts"
     }
   },
   "bin": {
-    "vibe-kanban-taskpicker": "./dist/index.js"
+    "vibe-kanban-taskpicker": "./dist/vibe-kanban-taskpicker.mjs"
   },
   "files": [
     "dist",
     "templates"
   ],
   "scripts": {
-    "build": "tsc",
-    "build:watch": "tsc --watch",
+    "build": "tsup",
+    "build:watch": "tsup --watch",
     "clean": "rm -rf dist",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@vibe-remote/vibe-kanban-api": "workspace:*",
     "@vibe-remote/shared-utils": "workspace:*",
+    "@vibe-remote/vibe-kanban-api": "workspace:*",
     "dotenv": "^16.3.1"
   },
   "keywords": [
@@ -43,5 +43,8 @@
   },
   "engines": {
     "node": ">=20.0.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.0"
   }
 }
