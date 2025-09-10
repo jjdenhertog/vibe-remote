@@ -53,10 +53,8 @@ temp/
 
 
 
+
 # Claude Flow generated files
-.claude-flow
-CLAUDE.md
-memory
 .claude/settings.local.json
 .mcp.json
 claude-flow.config.json

@@ -14,6 +14,7 @@ export async function createPullRequest(vibeContext: VibeKanbanContext): Promise
         if (existingPR) {
             console.error(`✅ Found existing PR: ${existingPR.pr_info.url} (status: ${existingPR.pr_info.status})`);
             console.error('⏸️ Skipping PR creation - PR already exists');
+            
             return existingPR.pr_info.url;
         }
 

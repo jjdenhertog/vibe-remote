@@ -4,6 +4,7 @@ import { VibeKanbanContext } from './types/VibeKanbanContext';
 import { validateEnvironment } from './functions/validateEnvironment';
 import { fetchVibeKanbanContext } from './functions/fetchVibeKanbanContext';
 import { createPullRequest } from './functions/createPullRequest';
+import { mergePullRequest } from './functions/mergePullRequest';
 import { readAutomationPreferences } from '@vibe-remote/shared-utils/preferences';
 
 class VibeKanbanCleanup {
@@ -26,6 +27,18 @@ class VibeKanbanCleanup {
             if (preferences.automaticallyCreatePR) {
                 const prUrl = await createPullRequest(this.vibeContext);
                 console.error(`\n✅ PR created: ${prUrl}`);
+                
+                // Handle auto-merge if enabled and mode is 'always'
+                if (preferences.autoMergePR && preferences.autoMergeDecisionMode === 'always') {
+                    console.error('\n🔀 Auto-merge mode is "always" - attempting to merge PR...');
+                    const mergeResult = await mergePullRequest();
+                    
+                    if (mergeResult.success) {
+                        console.error(`✅ ${mergeResult.message}`);
+                    } else {
+                        console.error(`❌ ${mergeResult.message}`);
+                    }
+                }
             } else {
                 console.error('\n⏸️ PR creation skipped (automaticallyCreatePR is disabled in preferences)');
             }
@@ -38,6 +51,10 @@ class VibeKanbanCleanup {
 
 
 }
+
+// Export functions for library usage
+export { mergePullRequest } from './functions/mergePullRequest';
+export type { MergeResult } from './functions/mergePullRequest';
 
 // Execute if this file is run directly
 const cleanup = new VibeKanbanCleanup();
