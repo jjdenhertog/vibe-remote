@@ -109,7 +109,7 @@ export const ConfigPage = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-            <div className="container mx-auto py-6">
+            <div className="container mx-auto py-6 max-w-4xl">
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
                     {/* Header */}
                     <div className="border-b border-gray-200 dark:border-gray-700 p-4">

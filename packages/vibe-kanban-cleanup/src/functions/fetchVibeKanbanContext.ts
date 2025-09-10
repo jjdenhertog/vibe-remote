@@ -1,18 +1,11 @@
 import { getInfo } from '@vibe-remote/vibe-kanban-api/api/containers/getInfo';
 import { getTaskAttempt } from '@vibe-remote/vibe-kanban-api/api/task-attempts/getTaskAttempt';
 import { getTask } from '@vibe-remote/vibe-kanban-api/api/tasks/getTask';
-import { setApiConfig } from '@vibe-remote/vibe-kanban-api/api/config/setApiConfig';
 import { VibeKanbanContext } from '../types/VibeKanbanContext';
 
 export async function fetchVibeKanbanContext(): Promise<VibeKanbanContext> {
     const worktreePath = process.cwd();
-    const apiBaseUrl = process.env.VIBE_KANBAN_API_URL || 'http://localhost:9091';
-
-    // Configure the shared API client
-    setApiConfig({
-        baseUrl: apiBaseUrl,
-        timeout: 30_000
-    });
+    const apiBaseUrl = 'http://localhost:9091';
 
     try {
         // Get container info using shared API

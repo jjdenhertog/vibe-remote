@@ -6,7 +6,6 @@ import { randomUUID } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { getTaskAttempt } from '@vibe-remote/vibe-kanban-api/api/task-attempts/getTaskAttempt';
 import { getTask } from '@vibe-remote/vibe-kanban-api/api/tasks/getTask';
-import { setApiConfig } from '@vibe-remote/vibe-kanban-api/api/config/setApiConfig';
 import { readAutomationPreferences, type AutomationPreferences } from '@vibe-remote/shared-utils/preferences';
 
 type PreferenceContext = {
@@ -229,13 +228,6 @@ export async function runAutoMerge(attemptId: string, prUrl: string, customPromp
     let tempFile: string | null = null;
     
     try {
-        // Configure API
-        const apiBaseUrl = process.env.VIBE_KANBAN_API_URL || 'http://localhost:9091';
-        setApiConfig({
-            baseUrl: apiBaseUrl,
-            timeout: 30_000
-        });
-
         // Get task data from vibe-kanban API
         console.log(`🔍 Fetching task attempt data for ID: ${attemptId}`);
         const taskAttempt = await getTaskAttempt(attemptId);
