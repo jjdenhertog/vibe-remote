@@ -12,6 +12,7 @@ import { readAutomationPreferences } from '@vibe-remote/shared-utils/readAutomat
 import { readPreferenceFile } from '@vibe-remote/shared-utils/readPreferenceFile';
 import { runClaudeCommand } from '@vibe-remote/shared-utils/runClaudeCommand';
 
+
 async function main(): Promise<void> {
     let promptFile = '';
 
