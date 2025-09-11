@@ -10,8 +10,7 @@
     }
   },
   "bin": {
-    "vibe-kanban-cleanup": "./dist/vibe-kanban-cleanup.mjs",
-    "vibe-start-task": "./dist/start-task-command.mjs"
+    "vibe-kanban-cleanup": "./dist/vibe-kanban-cleanup.mjs"
   },
   "files": [
     "dist"

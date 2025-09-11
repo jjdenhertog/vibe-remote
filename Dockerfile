@@ -120,7 +120,6 @@ COPY --from=builder /build/packages/claude-wrapper/dist/claude-wrapper.mjs /scri
 COPY --from=builder /build/packages/claude-wrapper/templates/ /scripts/claude-wrapper-dist/templates/
 
 COPY --from=builder /build/packages/vibe-kanban-cleanup/dist/vibe-kanban-cleanup.mjs /scripts/vibe-kanban-cleanup.mjs
-COPY --from=builder /build/packages/vibe-kanban-cleanup/dist/start-task-command.mjs /scripts/start-task-command.mjs
 
 COPY --from=builder /build/packages/vibe-kanban-taskpicker/dist/vibe-kanban-taskpicker.mjs /scripts/vibe-kanban-taskpicker.mjs
 COPY --from=builder /build/packages/vibe-kanban-taskpicker/templates/ /scripts/vibe-kanban-taskpicker-dist/templates/
@@ -141,7 +140,6 @@ RUN chmod +x /docker-entrypoint.sh /scripts/*.sh /scripts/*.mjs && \
     ln -s /scripts/init-project.sh /usr/local/bin/init-project && \
     ln -s /scripts/claude-wrapper.mjs /usr/local/bin/claude-wrapper && \
     ln -s /scripts/vibe-kanban-cleanup.mjs /usr/local/bin/vibe-kanban-cleanup && \
-    ln -s /scripts/start-task-command.mjs /usr/local/bin/vibe-start-task && \
     ln -s /scripts/vibe-kanban-taskpicker.mjs /usr/local/bin/vibe-kanban-taskpicker && \
     ln -s /scripts/setup-verify.sh /usr/local/bin/setup-verify && \
     ln -s /scripts/setup-storage-credentials.sh /usr/local/bin/setup-storage-credentials && \
