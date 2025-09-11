@@ -4,7 +4,7 @@ import { getTask } from '@vibe-remote/vibe-kanban-api/api/tasks/getTask';
 import { createTempPromptFile } from '@vibe-remote/shared-utils/createTempPromptFile';
 import { prependContextToPrompt } from '@vibe-remote/shared-utils/prependContextToPrompt';
 import { processTemplate } from '@vibe-remote/shared-utils/processTemplate';
-import { readAutomationPreferences } from '@vibe-remote/shared-utils/readAutomationPreferences';
+import { readAutomergePrompt } from '@vibe-remote/shared-utils/readAutomergePrompt';
 import { readPreferenceFiles } from '@vibe-remote/shared-utils/readPreferenceFiles';
 import { runClaudeCommand } from '@vibe-remote/shared-utils/runClaudeCommand';
 /**
@@ -24,13 +24,9 @@ export async function runAutoMerge(attemptId: string): Promise<void> {
         if (!task?.title || !task?.description)
             throw new Error(`Task not found for ID: ${taskAttempt.task_id}`);
 
-        const preferences = readAutomationPreferences();
-
         // Get project context
         const preferenceContext = readPreferenceFiles();
-        const promptTemplate = preferences.autoMergePrompt;
-        if (!promptTemplate)
-            throw new Error(`Auto-merge prompt template not found`);
+        const promptTemplate = readAutomergePrompt();
 
         // Process template with context
         const processedPrompt = processTemplate(promptTemplate, {

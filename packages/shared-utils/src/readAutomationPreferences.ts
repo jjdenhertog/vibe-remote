@@ -5,9 +5,8 @@ export type AutomationPreferences = {
     doCodeReviewBeforeFinishing: boolean;
     automaticTaskPicking: boolean;
     baseBranch: string;
-    autoMergePR?: boolean;
-    autoMergeDecisionMode?: 'always' | 'claude-decision';
-    autoMergePrompt?: string;
+    automaticallyMergePR?: boolean;
+    mergeDecisionMode?: 'always' | 'claude-decision';
 };
 
 export function readAutomationPreferences(): AutomationPreferences {
@@ -35,14 +34,11 @@ export function readAutomationPreferences(): AutomationPreferences {
             baseBranch: preferences.baseBranch ?? defaultPreferences.baseBranch
         };
 
-        if (preferences.autoMergePR !== undefined)
-            result.autoMergePR = preferences.autoMergePR;
+        if (preferences.automaticallyMergePR !== undefined)
+            result.automaticallyMergePR = preferences.automaticallyMergePR;
 
-        if (preferences.autoMergeDecisionMode !== undefined)
-            result.autoMergeDecisionMode = preferences.autoMergeDecisionMode;
-
-        if (preferences.autoMergePrompt !== undefined)
-            result.autoMergePrompt = preferences.autoMergePrompt;
+        if (preferences.mergeDecisionMode !== undefined)
+            result.mergeDecisionMode = preferences.mergeDecisionMode;
 
         return result;
     } catch (error) {

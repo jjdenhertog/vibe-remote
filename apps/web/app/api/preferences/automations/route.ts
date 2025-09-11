@@ -11,9 +11,8 @@ const DEFAULT_AUTOMATIONS = {
     doCodeReviewBeforeFinishing: false,
     automaticTaskPicking: false,
     baseBranch: 'main',
-    autoMergePR: false,
-    autoMergeDecisionMode: 'claude-decision',
-    autoMergePrompt: ''
+    automaticallyMergePR: false,
+    mergeDecisionMode: 'claude-decision'
 };
 
 export async function GET() {
@@ -58,26 +57,21 @@ export async function POST(request: NextRequest) {
             }
 
             // Validate optional auto-merge fields if present
-            if (parsed.autoMergePR !== undefined && typeof parsed.autoMergePR !== 'boolean') {
-                return new NextResponse('autoMergePR must be a boolean', { status: 400 });
+            if (parsed.automaticallyMergePR !== undefined && typeof parsed.automaticallyMergePR !== 'boolean') {
+                return new NextResponse('automaticallyMergePR must be a boolean', { status: 400 });
             }
 
-            if (parsed.autoMergeDecisionMode !== undefined && 
-                (typeof parsed.autoMergeDecisionMode !== 'string' || 
-                !['always', 'claude-decision'].includes(parsed.autoMergeDecisionMode))) {
-                return new NextResponse('autoMergeDecisionMode must be either "always" or "claude-decision"', { status: 400 });
-            }
-
-            if (parsed.autoMergePrompt !== undefined && typeof parsed.autoMergePrompt !== 'string') {
-                return new NextResponse('autoMergePrompt must be a string', { status: 400 });
+            if (parsed.mergeDecisionMode !== undefined && 
+                (typeof parsed.mergeDecisionMode !== 'string' || 
+                !['always', 'claude-decision'].includes(parsed.mergeDecisionMode))) {
+                return new NextResponse('mergeDecisionMode must be either "always" or "claude-decision"', { status: 400 });
             }
 
             // Set defaults for missing auto-merge fields
             const validatedData = {
                 ...parsed,
-                autoMergePR: parsed.autoMergePR ?? DEFAULT_AUTOMATIONS.autoMergePR,
-                autoMergeDecisionMode: parsed.autoMergeDecisionMode ?? DEFAULT_AUTOMATIONS.autoMergeDecisionMode,
-                autoMergePrompt: parsed.autoMergePrompt ?? DEFAULT_AUTOMATIONS.autoMergePrompt
+                automaticallyMergePR: parsed.automaticallyMergePR ?? DEFAULT_AUTOMATIONS.automaticallyMergePR,
+                mergeDecisionMode: parsed.mergeDecisionMode ?? DEFAULT_AUTOMATIONS.mergeDecisionMode
             };
 
             // Set final content with validated data
