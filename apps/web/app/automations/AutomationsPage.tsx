@@ -335,7 +335,16 @@ export const AutomationsPage = () => {
                                 </div>
                                 
                                 {/* Editor */}
-                                <div className="h-[500px] mt-4">
+                                <div 
+                                    className="mt-4 border border-gray-300 dark:border-gray-600 rounded overflow-hidden"
+                                    style={{
+                                        height: '500px',
+                                        minHeight: '200px',
+                                        maxHeight: '800px',
+                                        resize: 'vertical',
+                                        overflow: 'auto'
+                                    }}
+                                >
                                     {activePromptTab === 'review' && (
                                         <Editor
                                             value={reviewPrompt}
