@@ -29,7 +29,7 @@ class VibeKanbanCleanup {
                 console.log(`\n✅ PR created: ${prUrl}`);
 
                 // Handle auto-merge based on preferences
-                if (preferences.autoMergePR)
+                if (preferences.automaticallyMergePR)
                     await this.handleAutoMerge(preferences, prUrl, context);
 
             } else {
@@ -47,7 +47,7 @@ class VibeKanbanCleanup {
 
         console.log(`\n🔗 PR URL for merge: ${prUrl}`);
 
-        if (preferences.autoMergeDecisionMode === 'always') {
+        if (preferences.mergeDecisionMode === 'always') {
             console.log('\n🔀 Auto-merge mode is "always" - attempting to merge PR...');
 
             try {
@@ -59,7 +59,7 @@ class VibeKanbanCleanup {
             return;
         }
 
-        if (preferences.autoMergeDecisionMode === 'claude-decision') {
+        if (preferences.mergeDecisionMode === 'claude-decision') {
             console.log('\n🤖 Auto-merge mode is "claude-decision" - running Claude evaluation...');
             console.log(`📋 Task context: "${context.task.title}"`);
             console.log(`🔍 Attempt ID: ${context.containerInfo.attempt_id}`);

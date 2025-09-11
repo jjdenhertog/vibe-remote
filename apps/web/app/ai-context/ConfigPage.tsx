@@ -9,26 +9,22 @@ import Link from 'next/link';
 export const ConfigPage = () => {
     const [projectContext, setProjectContext] = useState('');
     const [codingStandards, setCodingStandards] = useState('');
-    const [prPrompt, setPrPrompt] = useState('');
-    const [activeTab, setActiveTab] = useState<'project-context' | 'coding-standards' | 'pr-prompt'>('project-context');
+    const [activeTab, setActiveTab] = useState<'project-context' | 'coding-standards'>('project-context');
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
 
     const loadFiles = useCallback(async () => {
         try {
-            const [projectResponse, codingResponse, prPromptResponse] = await Promise.all([
+            const [projectResponse, codingResponse] = await Promise.all([
                 fetch('/api/preferences/project-context'),
-                fetch('/api/preferences/coding-standards'),
-                fetch('/api/preferences/pr-prompt')
+                fetch('/api/preferences/coding-standards')
             ]);
 
             const projectData = await projectResponse.text();
             const codingData = await codingResponse.text();
-            const prPromptData = await prPromptResponse.text();
 
             setProjectContext(projectData);
             setCodingStandards(codingData);
-            setPrPrompt(prPromptData);
         } catch (error) {
             console.error('Error loading files:', error);
             enqueueSnackbar('Error loading preference files', { variant: 'error' });
@@ -54,11 +50,6 @@ export const ConfigPage = () => {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain' },
                     body: codingStandards
-                }),
-                fetch('/api/preferences/pr-prompt', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain' },
-                    body: prPrompt
                 })
             ]);
 
@@ -69,7 +60,7 @@ export const ConfigPage = () => {
         } finally {
             setSaving(false);
         }
-    }, [projectContext, codingStandards, prPrompt]);
+    }, [projectContext, codingStandards]);
 
     const handleProjectContextChange = useCallback((value: string | undefined) => {
         setProjectContext(value || '');
@@ -79,9 +70,6 @@ export const ConfigPage = () => {
         setCodingStandards(value || '');
     }, []);
 
-    const handlePrPromptChange = useCallback((value: string | undefined) => {
-        setPrPrompt(value || '');
-    }, []);
 
     const handleProjectTabClick = useCallback(() => {
         setActiveTab('project-context');
@@ -91,9 +79,6 @@ export const ConfigPage = () => {
         setActiveTab('coding-standards');
     }, []);
 
-    const handlePrPromptTabClick = useCallback(() => {
-        setActiveTab('pr-prompt');
-    }, []);
 
     const handleSaveClick = useCallback(() => {
         handleSave().catch(console.error);
@@ -164,18 +149,6 @@ export const ConfigPage = () => {
                                 <FileText className="w-4 h-4 inline-block mr-2" />
                                 Coding Standards
                             </button>
-                            <button
-                                type="button"
-                                onClick={handlePrPromptTabClick}
-                                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                                    activeTab === 'pr-prompt'
-                                        ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
-                                }`}
-                            >
-                                <FileText className="w-4 h-4 inline-block mr-2" />
-                                PR Prompt
-                            </button>
                         </nav>
                     </div>
 
@@ -202,21 +175,6 @@ export const ConfigPage = () => {
                                 language="markdown"
                                 theme="vs-dark"
                                 onChange={handleCodingStandardsChange}
-                                options={{
-                                    fontSize: 14,
-                                    wordWrap: 'on',
-                                    minimap: { enabled: false },
-                                    scrollBeyondLastLine: false,
-                                    automaticLayout: true,
-                                }}
-                            />
-                        )}
-                        {activeTab === 'pr-prompt' && (
-                            <Editor
-                                value={prPrompt}
-                                language="markdown"
-                                theme="vs-dark"
-                                onChange={handlePrPromptChange}
                                 options={{
                                     fontSize: 14,
                                     wordWrap: 'on',

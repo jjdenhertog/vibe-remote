@@ -1,9 +1,8 @@
 'use client';
 
 import React from 'react';
-import { ToggleLeft, ToggleRight, CheckCircle2, GitPullRequest, Settings, GitBranch, GitMerge, Sparkles } from 'lucide-react';
+import { ToggleLeft, ToggleRight, CheckCircle2, GitPullRequest, Settings, GitBranch, GitMerge } from 'lucide-react';
 import type { BranchInfo, ProjectBranchesResponse } from '@vibe-remote/vibe-kanban-api/types/api';
-import { ClaudePromptEditor } from './ClaudePromptEditor';
 import { AutomationStatusSummary } from './AutomationStatusSummary';
 
 type AutomationSettings = {
@@ -13,41 +12,30 @@ type AutomationSettings = {
     baseBranch: string;
     automaticallyMergePR: boolean;
     mergeDecisionMode: 'always' | 'claude-decision';
-    claudeMergePrompt: string;
 };
 
 type AutomationSettingsProps = {
     readonly settings: AutomationSettings;
     readonly branchData: ProjectBranchesResponse | null;
     readonly branchesLoading: boolean;
-    readonly showPromptEditor: boolean;
-    readonly saving: boolean;
     readonly onAutoPRToggle: () => void;
     readonly onCodeReviewToggle: () => void;
     readonly onTaskPickingToggle: () => void;
     readonly onBranchSelectChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
     readonly onAutoMergeToggle: () => void;
     readonly onMergeDecisionModeChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-    readonly onPromptEditorToggle: () => void;
-    readonly onClaudePromptChange: (value: string) => void;
-    readonly onSaveClick: () => void;
 };
 
 export const AutomationSettings: React.FC<AutomationSettingsProps> = ({
     settings,
     branchData,
     branchesLoading,
-    showPromptEditor,
-    saving,
     onAutoPRToggle,
     onCodeReviewToggle,
     onTaskPickingToggle,
     onBranchSelectChange,
     onAutoMergeToggle,
-    onMergeDecisionModeChange,
-    onPromptEditorToggle,
-    onClaudePromptChange,
-    onSaveClick
+    onMergeDecisionModeChange
 }) => {
     return (
         <div className="space-y-6">
@@ -134,28 +122,12 @@ export const AutomationSettings: React.FC<AutomationSettingsProps> = ({
                                 <option value="claude-decision">Claude Decision</option>
                             </select>
 
-                            {/* Claude Prompt Editor Toggle */}
+                            {/* Info message for Claude Decision mode */}
                             {settings.mergeDecisionMode === 'claude-decision' && (
                                 <div className="mt-3">
-                                    <button
-                                        type="button"
-                                        onClick={onPromptEditorToggle}
-                                        className="inline-flex items-center gap-2 text-sm text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
-                                    >
-                                        <Sparkles className="w-4 h-4" />
-                                        {showPromptEditor ? 'Hide' : 'Edit'} Claude Prompt
-                                    </button>
-
-                                    {/* Inline Prompt Editor */}
-                                    {showPromptEditor ? <div className="mt-4 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg">
-                                        <ClaudePromptEditor
-                                            prompt={settings.claudeMergePrompt}
-                                            onPromptChange={onClaudePromptChange}
-                                            onSave={onSaveClick}
-                                            onBack={onPromptEditorToggle}
-                                            saving={saving}
-                                        />
-                                    </div> : null}
+                                    <p className="text-xs text-purple-600 dark:text-purple-400">
+                                        Claude will review and decide whether to merge the PR
+                                    </p>
                                 </div>
                             )}
                         </div>

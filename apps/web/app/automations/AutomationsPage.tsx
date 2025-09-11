@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { enqueueSnackbar } from 'notistack';
-import { Save, ArrowLeft, Code } from 'lucide-react';
+import { Save, ArrowLeft, Code, FileText } from 'lucide-react';
 import Link from 'next/link';
 import type { ProjectBranchesResponse } from '@vibe-remote/vibe-kanban-api/types/api';
 import { AutomationSettings } from './components/AutomationSettings';
 import { JsonEditor } from './components/JsonEditor';
+import { Editor } from '@monaco-editor/react';
 
 type AutomationSettings = {
     automaticallyCreatePR: boolean;
@@ -15,7 +16,6 @@ type AutomationSettings = {
     baseBranch: string;
     automaticallyMergePR: boolean;
     mergeDecisionMode: 'always' | 'claude-decision';
-    claudeMergePrompt: string;
 };
 
 
@@ -26,9 +26,10 @@ export const AutomationsPage = () => {
         automaticTaskPicking: false,
         baseBranch: 'main',
         automaticallyMergePR: false,
-        mergeDecisionMode: 'always',
-        claudeMergePrompt: 'Review this pull request and decide if it should be automatically merged.\n\n## Quick Assessment (Score 1-10):\n\n**1. Code Quality (40%)**\n- Clean, readable code\n- No obvious bugs or issues\n- Follows existing patterns\n\n**2. Safety & Risk (35%)**\n- No breaking changes\n- No security issues\n- Safe to deploy\n\n**3. Completeness (25%)**\n- Feature/fix is complete\n- No work-in-progress code\n- Addresses the requirements\n\n## Decision:\n\n**MERGE if total score ≥ 7/10**\n\n### If MERGING:\n```\nSCORE: [X]/10\nDECISION: MERGE\nREASON: [brief why]\n\ngh pr merge {{PR_URL}} --squash --body "Auto-merged: [X]/10" --delete-branch\n```\n\n### If NOT MERGING:\n```\nSCORE: [X]/10\nDECISION: DO NOT MERGE\nREASON: [main issues]\n```\n\nBe pragmatic - focus on shipping working code, not perfection.'
+        mergeDecisionMode: 'always'
     });
+    const [reviewPrompt, setReviewPrompt] = useState('');
+    const [automergePrompt, setAutomergePrompt] = useState('');
     const [jsonValue, setJsonValue] = useState('');
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -37,11 +38,19 @@ export const AutomationsPage = () => {
     const [branchesLoading, setBranchesLoading] = useState(false);
     const [showPromptEditor, setShowPromptEditor] = useState(false);
     const [showJsonEditor, setShowJsonEditor] = useState(false);
+    const [activePromptTab, setActivePromptTab] = useState<'review' | 'automerge'>('review');
 
     const loadSettings = useCallback(async () => {
         try {
-            const response = await fetch('/api/preferences/automations');
-            const data = await response.text();
+            const [automationResponse, reviewResponse, automergeResponse] = await Promise.all([
+                fetch('/api/preferences/automations'),
+                fetch('/api/preferences/review-prompt'),
+                fetch('/api/preferences/automerge-prompt')
+            ]);
+            
+            const data = await automationResponse.text();
+            const reviewData = await reviewResponse.text();
+            const automergeData = await automergeResponse.text();
 
             try {
                 const parsed = JSON.parse(data);
@@ -53,11 +62,12 @@ export const AutomationsPage = () => {
                     baseBranch: 'main',
                     automaticallyMergePR: false,
                     mergeDecisionMode: 'always' as const,
-                    claudeMergePrompt: 'Review this pull request and decide if it should be automatically merged.\n\n## Quick Assessment (Score 1-10):\n\n**1. Code Quality (40%)**\n- Clean, readable code\n- No obvious bugs or issues\n- Follows existing patterns\n\n**2. Safety & Risk (35%)**\n- No breaking changes\n- No security issues\n- Safe to deploy\n\n**3. Completeness (25%)**\n- Feature/fix is complete\n- No work-in-progress code\n- Addresses the requirements\n\n## Decision:\n\n**MERGE if total score ≥ 7/10**\n\n### If MERGING:\n```\nSCORE: [X]/10\nDECISION: MERGE\nREASON: [brief why]\n\ngh pr merge {{PR_URL}} --squash --body "Auto-merged: [X]/10" --delete-branch\n```\n\n### If NOT MERGING:\n```\nSCORE: [X]/10\nDECISION: DO NOT MERGE\nREASON: [main issues]\n```\n\nBe pragmatic - focus on shipping working code, not perfection.',
                     ...parsed
                 };
                 setSettings(mergedSettings);
                 setJsonValue(JSON.stringify(mergedSettings, null, 2));
+                setReviewPrompt(reviewData);
+                setAutomergePrompt(automergeData);
                 setJsonError(null);
             } catch (parseError) {
                 console.error('Error parsing automation settings:', parseError);
@@ -102,11 +112,23 @@ export const AutomationsPage = () => {
             // Validate JSON before saving
             const parsedSettings = JSON.parse(jsonValue);
             
-            await fetch('/api/preferences/automations', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: jsonValue
-            });
+            await Promise.all([
+                fetch('/api/preferences/automations', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: jsonValue
+                }),
+                fetch('/api/preferences/review-prompt', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: reviewPrompt
+                }),
+                fetch('/api/preferences/automerge-prompt', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: automergePrompt
+                })
+            ]);
 
             setSettings(parsedSettings);
             setJsonError(null);
@@ -122,7 +144,7 @@ export const AutomationsPage = () => {
         } finally {
             setSaving(false);
         }
-    }, [jsonValue]);
+    }, [jsonValue, reviewPrompt, automergePrompt]);
 
     const handleJsonChange = useCallback((value: string | undefined = '') => {
         setJsonValue(value);
@@ -193,21 +215,29 @@ export const AutomationsPage = () => {
 
     const handlePromptEditorToggle = useCallback(() => {
         setShowPromptEditor(!showPromptEditor);
+        setShowJsonEditor(false);
     }, [showPromptEditor]);
 
     const handleJsonEditorToggle = useCallback(() => {
         setShowJsonEditor(!showJsonEditor);
+        setShowPromptEditor(false);
     }, [showJsonEditor]);
 
-    const handleClaudePromptChange = useCallback((value: string) => {
-        const newSettings = {
-            ...settings,
-            claudeMergePrompt: value
-        };
-        setSettings(newSettings);
-        setJsonValue(JSON.stringify(newSettings, null, 2));
-        setJsonError(null);
-    }, [settings]);
+    const handleReviewPromptChange = useCallback((value: string | undefined) => {
+        setReviewPrompt(value || '');
+    }, []);
+
+    const handleAutomergePromptChange = useCallback((value: string | undefined) => {
+        setAutomergePrompt(value || '');
+    }, []);
+
+    const handleReviewTabClick = useCallback(() => {
+        setActivePromptTab('review');
+    }, []);
+
+    const handleAutomergeTabClick = useCallback(() => {
+        setActivePromptTab('automerge');
+    }, []);
 
     const handleSaveClick = useCallback(() => {
         handleSave().catch(console.error);
@@ -243,6 +273,14 @@ export const AutomationsPage = () => {
                             <div className="flex items-center gap-3">
                                 <button
                                     type="button"
+                                    onClick={handlePromptEditorToggle}
+                                    className="inline-flex items-center gap-2 px-3 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                >
+                                    <FileText className="w-4 h-4" />
+                                    {showPromptEditor ? 'Hide Prompts' : 'Edit Prompts'}
+                                </button>
+                                <button
+                                    type="button"
                                     onClick={handleJsonEditorToggle}
                                     className="inline-flex items-center gap-2 px-3 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                                 >
@@ -263,7 +301,74 @@ export const AutomationsPage = () => {
                     </div>
 
                     <div className="p-6">
-                        {showJsonEditor ? (
+                        {showPromptEditor ? (
+                            /* Prompt Editors */
+                            <>
+                                {/* Tabs */}
+                                <div className="border-b border-gray-200 dark:border-gray-700">
+                                    <nav className="flex space-x-8 mb-4">
+                                        <button
+                                            type="button"
+                                            onClick={handleReviewTabClick}
+                                            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                                                activePromptTab === 'review'
+                                                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                                                    : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                                            }`}
+                                        >
+                                            <FileText className="w-4 h-4 inline-block mr-2" />
+                                            Review Prompt
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={handleAutomergeTabClick}
+                                            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                                                activePromptTab === 'automerge'
+                                                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                                                    : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                                            }`}
+                                        >
+                                            <FileText className="w-4 h-4 inline-block mr-2" />
+                                            Auto-merge Prompt
+                                        </button>
+                                    </nav>
+                                </div>
+                                
+                                {/* Editor */}
+                                <div className="h-[500px] mt-4">
+                                    {activePromptTab === 'review' && (
+                                        <Editor
+                                            value={reviewPrompt}
+                                            language="markdown"
+                                            theme="vs-dark"
+                                            onChange={handleReviewPromptChange}
+                                            options={{
+                                                fontSize: 14,
+                                                wordWrap: 'on',
+                                                minimap: { enabled: false },
+                                                scrollBeyondLastLine: false,
+                                                automaticLayout: true,
+                                            }}
+                                        />
+                                    )}
+                                    {activePromptTab === 'automerge' && (
+                                        <Editor
+                                            value={automergePrompt}
+                                            language="markdown"
+                                            theme="vs-dark"
+                                            onChange={handleAutomergePromptChange}
+                                            options={{
+                                                fontSize: 14,
+                                                wordWrap: 'on',
+                                                minimap: { enabled: false },
+                                                scrollBeyondLastLine: false,
+                                                automaticLayout: true,
+                                            }}
+                                        />
+                                    )}
+                                </div>
+                            </>
+                        ) : showJsonEditor ? (
                             /* JSON Editor */
                             <JsonEditor
                                 jsonValue={jsonValue}
@@ -276,17 +381,12 @@ export const AutomationsPage = () => {
                                 settings={settings}
                                 branchData={branchData}
                                 branchesLoading={branchesLoading}
-                                showPromptEditor={showPromptEditor}
-                                saving={saving}
                                 onAutoPRToggle={handleAutoPRToggle}
                                 onCodeReviewToggle={handleCodeReviewToggle}
                                 onTaskPickingToggle={handleTaskPickingToggle}
                                 onBranchSelectChange={handleBranchSelectChange}
                                 onAutoMergeToggle={handleAutoMergeToggle}
                                 onMergeDecisionModeChange={handleMergeDecisionModeChange}
-                                onPromptEditorToggle={handlePromptEditorToggle}
-                                onClaudePromptChange={handleClaudePromptChange}
-                                onSaveClick={handleSaveClick}
                             />
                         )}
                     </div>

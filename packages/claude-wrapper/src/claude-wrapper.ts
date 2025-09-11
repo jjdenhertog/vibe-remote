@@ -9,7 +9,7 @@ import { readPreferenceFiles } from '@vibe-remote/shared-utils/readPreferenceFil
 import { createTempPromptFile } from '@vibe-remote/shared-utils/createTempPromptFile';
 import { prependContextToPrompt } from '@vibe-remote/shared-utils/prependContextToPrompt';
 import { readAutomationPreferences } from '@vibe-remote/shared-utils/readAutomationPreferences';
-import { readPreferenceFile } from '@vibe-remote/shared-utils/readPreferenceFile';
+import { readReviewPrompt } from '@vibe-remote/shared-utils/readReviewPrompt';
 import { runClaudeCommand } from '@vibe-remote/shared-utils/runClaudeCommand';
 
 
@@ -132,16 +132,10 @@ function runClaudeFlowInit(): Promise<void> {
 
 async function executeCodeReview(originalPrompt: string, additionalArgs: string[] = []): Promise<void> {
 
-    const prPromptTemplate = readPreferenceFile('pr-prompt.md');
-    if (!prPromptTemplate) {
-        console.error('⚠️ Code review enabled but pr-prompt.md not found, skipping code review');
-
-        return;
-    }
-
+    const reviewPromptTemplate = readReviewPrompt();
     console.log('🔍 Starting code review process...');
 
-    const codeReviewPrompt = `\n\nThe following task was executed:\n\n${originalPrompt}${prPromptTemplate}`;
+    const codeReviewPrompt = `\n\nThe following task was executed:\n\n${originalPrompt}${reviewPromptTemplate}`;
     const promptFile = createTempPromptFile('code-review');
     writeFileSync(promptFile, codeReviewPrompt);
     await runClaudeCommand({promptFile, additionalArgs});

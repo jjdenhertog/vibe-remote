@@ -9,7 +9,6 @@ type AutomationSettings = {
     baseBranch: string;
     automaticallyMergePR: boolean;
     mergeDecisionMode: 'always' | 'claude-decision';
-    claudeMergePrompt: string;
 };
 
 type AutomationStatusSummaryProps = {
