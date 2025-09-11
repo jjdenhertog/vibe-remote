@@ -4,9 +4,9 @@ import { join } from 'node:path';
 import { existsSync } from 'node:fs';
 
 const PREFERENCES_DIR = '/workspace/data/preferences';
-const PR_PROMPT_FILE = join(PREFERENCES_DIR, 'pr-prompt.md');
+const REVIEW_PROMPT_FILE = join(PREFERENCES_DIR, 'review-prompt.md');
 
-const DEFAULT_PR_PROMPT = `Your goal is to code review the current project before a PR is being created.
+const DEFAULT_REVIEW_PROMPT = `Your goal is to code review the current project before a PR is being created.
 
 ## Analysis Requirements
 1. **Assess the codebase thoroughly**
@@ -36,19 +36,19 @@ export async function GET() {
         }
 
         // Check if file exists, create with default content if not
-        if (!existsSync(PR_PROMPT_FILE)) {
-            await writeFile(PR_PROMPT_FILE, DEFAULT_PR_PROMPT);
+        if (!existsSync(REVIEW_PROMPT_FILE)) {
+            await writeFile(REVIEW_PROMPT_FILE, DEFAULT_REVIEW_PROMPT);
 
-            return new NextResponse(DEFAULT_PR_PROMPT);
+            return new NextResponse(DEFAULT_REVIEW_PROMPT);
         }
 
-        const content = await readFile(PR_PROMPT_FILE, 'utf8');
+        const content = await readFile(REVIEW_PROMPT_FILE, 'utf8');
 
         return new NextResponse(content);
     } catch (error) {
-        console.error('Error reading pr-prompt.md:', error);
+        console.error('Error reading review-prompt.md:', error);
 
-        return new NextResponse('Error loading PR prompt', { status: 500 });
+        return new NextResponse('Error loading review prompt', { status: 500 });
     }
 }
 
@@ -61,12 +61,12 @@ export async function POST(request: NextRequest) {
             await mkdir(PREFERENCES_DIR, { recursive: true });
         }
 
-        await writeFile(PR_PROMPT_FILE, content);
+        await writeFile(REVIEW_PROMPT_FILE, content);
 
-        return new NextResponse('PR prompt saved successfully');
+        return new NextResponse('Review prompt saved successfully');
     } catch (error) {
-        console.error('Error saving pr-prompt.md:', error);
+        console.error('Error saving review-prompt.md:', error);
 
-        return new NextResponse('Error saving PR prompt', { status: 500 });
+        return new NextResponse('Error saving review prompt', { status: 500 });
     }
 }
