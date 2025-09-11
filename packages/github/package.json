@@ -1,0 +1,19 @@
+{
+    "name": "@vibe-remote/github",
+    "version": "1.0.0",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "type": "module",
+    "scripts": {
+        "build": "tsc",
+        "type-check": "tsc --noEmit",
+        "lint": "eslint --fix src"
+    },
+    "dependencies": {
+        "execa": "^9.5.2"
+    },
+    "devDependencies": {
+        "@types/node": "^22.10.5",
+        "typescript": "^5.7.2"
+    }
+}
