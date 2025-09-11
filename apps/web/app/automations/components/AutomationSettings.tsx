@@ -141,7 +141,7 @@ export const AutomationSettings: React.FC<AutomationSettingsProps> = ({
                                         <div className="bg-gray-100 dark:bg-gray-800 px-3 py-2 border-b border-gray-300 dark:border-gray-600">
                                             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Auto-merge Prompt</span>
                                         </div>
-                                        <div className="h-[200px]">
+                                        <div className="h-[200px] min-h-[100px] max-h-[600px] resize-y overflow-auto">
                                             <Editor
                                                 value={automergePrompt}
                                                 language="markdown"
@@ -201,7 +201,7 @@ export const AutomationSettings: React.FC<AutomationSettingsProps> = ({
                         <div className="bg-gray-100 dark:bg-gray-800 px-3 py-2 border-b border-gray-300 dark:border-gray-600">
                             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Review Prompt</span>
                         </div>
-                        <div className="h-[200px]">
+                        <div className="h-[200px] min-h-[100px] max-h-[600px] resize-y overflow-auto">
                             <Editor
                                 value={reviewPrompt}
                                 language="markdown"

@@ -26,7 +26,7 @@ export const JsonEditor: React.FC<JsonEditorProps> = ({
                     </p>
                 </div>
             )}
-            <div className="h-[400px] border rounded-lg overflow-hidden">
+            <div className="h-[400px] min-h-[200px] max-h-[800px] resize-y overflow-auto border rounded-lg">
                 <Editor
                     value={jsonValue}
                     language="json"
