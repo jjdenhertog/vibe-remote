@@ -28,17 +28,14 @@ export function readAutomationPreferences(): AutomationPreferences {
         const preferences = JSON.parse(fileContent) as Partial<AutomationPreferences>;
 
         const result: AutomationPreferences = {
-            automaticallyCreatePR: preferences.automaticallyCreatePR ?? defaultPreferences.automaticallyCreatePR,
-            doCodeReviewBeforeFinishing: preferences.doCodeReviewBeforeFinishing ?? defaultPreferences.doCodeReviewBeforeFinishing,
-            automaticTaskPicking: preferences.automaticTaskPicking ?? defaultPreferences.automaticTaskPicking,
-            baseBranch: preferences.baseBranch ?? defaultPreferences.baseBranch
+            automaticallyCreatePR: !!preferences.automaticallyCreatePR,
+            doCodeReviewBeforeFinishing: !!preferences.doCodeReviewBeforeFinishing,
+            automaticTaskPicking: !!preferences.automaticTaskPicking,
+            baseBranch: preferences.baseBranch ?? defaultPreferences.baseBranch,
+            automaticallyMergePR: !!preferences.automaticallyMergePR,
+            mergeDecisionMode: preferences.mergeDecisionMode || 'always'
         };
 
-        if (preferences.automaticallyMergePR !== undefined)
-            result.automaticallyMergePR = preferences.automaticallyMergePR;
-
-        if (preferences.mergeDecisionMode !== undefined)
-            result.mergeDecisionMode = preferences.mergeDecisionMode;
 
         return result;
     } catch (error) {

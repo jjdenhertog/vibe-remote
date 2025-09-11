@@ -31,7 +31,6 @@ async function main(): Promise<void> {
         const automationPreferences = readAutomationPreferences();
 
         const preferenceContext = readPreferenceFiles();
-        // const enhancedPrompt = prependContextToPrompt(prompt, preferenceContext);
         const currentDir = dirname(new URL(import.meta.url).pathname);
         const templatesDir = join(currentDir, 'claude-wrapper-dist', 'templates');
 
@@ -41,9 +40,6 @@ async function main(): Promise<void> {
             writeFileSync(promptFile, prompt);
 
             await runClaudeCommand({promptFile, additionalArgs});
-
-            if (automationPreferences.doCodeReviewBeforeFinishing)
-                await executeCodeReview(prompt, additionalArgs);
 
         } else if (useFlow) {
             console.log('🔄 Initializing claude-flow...');
@@ -80,6 +76,9 @@ async function main(): Promise<void> {
             writeFileSync(promptFile, enhancedPrompt);
 
             await runClaudeCommand({promptFile, additionalArgs});
+
+            if (automationPreferences.doCodeReviewBeforeFinishing)
+                await executeCodeReview(prompt, additionalArgs);
         }
 
     } catch (error) {

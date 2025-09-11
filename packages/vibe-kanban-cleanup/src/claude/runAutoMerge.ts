@@ -34,7 +34,7 @@ export async function runAutoMerge(attemptId: string): Promise<void> {
             taskDescription: task.description,
         });
 
-        const enhancedPrompt = prependContextToPrompt(processedPrompt, preferenceContext);;
+        const enhancedPrompt = prependContextToPrompt(processedPrompt, preferenceContext);
         // Create temporary file for the prompt
         promptFile = createTempPromptFile('auto-merge');
         writeFileSync(promptFile, enhancedPrompt, 'utf8');
@@ -44,7 +44,7 @@ export async function runAutoMerge(attemptId: string): Promise<void> {
         console.log(`🎯 Claude will analyze local worktree changes against task requirements`);
 
         // Execute Claude command
-        await runClaudeCommand({ promptFile });
+        await runClaudeCommand({ promptFile, showProgress: true });
 
         console.log(`✅ Auto-merge decision process completed`);
         console.log(`📋 Note: Check above output for Claude's merge decision and actions`);
