@@ -44,7 +44,7 @@ export async function runAutoMerge(attemptId: string): Promise<void> {
         console.log(`🎯 Claude will analyze local worktree changes against task requirements`);
 
         // Execute Claude command
-        await runClaudeCommand({ promptFile, streamOutput: false, verbose: false });
+        await runClaudeCommand({ promptFile });
 
         console.log(`✅ Auto-merge decision process completed`);
         console.log(`📋 Note: Check above output for Claude's merge decision and actions`);
