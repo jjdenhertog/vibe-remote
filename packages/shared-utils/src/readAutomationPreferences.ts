@@ -11,18 +11,18 @@ export type AutomationPreferences = {
 };
 
 export function readAutomationPreferences(): AutomationPreferences {
+
     const defaultPreferences: AutomationPreferences = {
         automaticallyCreatePR: false,
         doCodeReviewBeforeFinishing: false,
         automaticTaskPicking: false,
-        baseBranch: 'main'
+        baseBranch: 'dev'
     };
 
     const preferencesPath = '/workspace/data/preferences/automations.json';
 
-    if (!existsSync(preferencesPath)) {
+    if (!existsSync(preferencesPath))
         return defaultPreferences;
-    }
 
     try {
         const fileContent = readFileSync(preferencesPath, 'utf8');
@@ -35,17 +35,14 @@ export function readAutomationPreferences(): AutomationPreferences {
             baseBranch: preferences.baseBranch ?? defaultPreferences.baseBranch
         };
 
-        if (preferences.autoMergePR !== undefined) {
+        if (preferences.autoMergePR !== undefined)
             result.autoMergePR = preferences.autoMergePR;
-        }
-        
-        if (preferences.autoMergeDecisionMode !== undefined) {
-            result.autoMergeDecisionMode = preferences.autoMergeDecisionMode;
-        }
 
-        if (preferences.autoMergePrompt !== undefined) {
+        if (preferences.autoMergeDecisionMode !== undefined)
+            result.autoMergeDecisionMode = preferences.autoMergeDecisionMode;
+
+        if (preferences.autoMergePrompt !== undefined)
             result.autoMergePrompt = preferences.autoMergePrompt;
-        }
 
         return result;
     } catch (error) {

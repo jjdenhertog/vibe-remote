@@ -1,8 +1,5 @@
 import type { Task } from '../types/api';
 
-/**
- * Simple project analysis result - only focuses on blocking conditions
- */
 export type ProjectAnalysis = {
     projectId: string;
     tasks: Task[];
@@ -12,10 +9,6 @@ export type ProjectAnalysis = {
     inProgressTasks: Task[];
 };
 
-/**
- * Analyze project to determine if we should proceed with Claude task selection
- * Only checks for blocking conditions - leaves task selection to Claude
- */
 export function analyzeProject(projectId: string, tasks: Task[]): ProjectAnalysis {
     // Find blocking tasks
     const inReviewTasks = tasks.filter(t => t.status === 'inreview');
@@ -42,9 +35,8 @@ export function analyzeProject(projectId: string, tasks: Task[]): ProjectAnalysi
         inProgressTasks
     };
     
-    if (stopReason) {
+    if (stopReason) 
         result.stopReason = stopReason;
-    }
     
     return result;
 }

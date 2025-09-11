@@ -1,12 +1,13 @@
 import { listProjects } from '@vibe-remote/vibe-kanban-api/api/projects/listProjects';
 import { listTasks } from '@vibe-remote/vibe-kanban-api/api/tasks/listTasks';
 import { analyzeProject, ProjectAnalysis } from '@vibe-remote/vibe-kanban-api/utils/taskAnalyzer';
-import { spawn } from 'node:child_process';
-import { mkdtempSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 
 import type { Task } from '@vibe-remote/vibe-kanban-api/types/api';
-import { readAutomationPreferences } from '../utils/readAutomationPreferences';
+import { readAutomationPreferences } from '@vibe-remote/shared-utils/readAutomationPreferences';
+import { createTempPromptFile } from '@vibe-remote/shared-utils/createTempPromptFile';
+import { runClaudeCommand } from '@vibe-remote/shared-utils/runClaudeCommand';
 
 export async function runTaskPicker(): Promise<void> {
     try {
@@ -40,75 +41,29 @@ export async function runTaskPicker(): Promise<void> {
 }
 
 async function runClaudeTaskSelection(analysis: ProjectAnalysis, projectId: string): Promise<void> {
-    return new Promise((resolvePromise, reject) => {
-        // Find the task picker prompt template (same pattern as claude-wrapper)
-        const currentDir = dirname(new URL(import.meta.url).pathname);
-        const templatePath = join(currentDir, 'vibe-kanban-taskpicker-dist', 'templates', 'task-picker-prompt.md');
+    // Find the task picker prompt template (same pattern as claude-wrapper)
 
-        let promptTemplate: string;
+    const currentDir = dirname(new URL(import.meta.url).pathname);
+    const templatesDir = join(currentDir, 'claude-wrapper-dist', 'templates');
+    const templatePath = join(templatesDir, 'task-picker-prompt.md');
 
-        try {
-            promptTemplate = readFileSync(templatePath, 'utf8');
-        } catch (error) {
-            reject(new Error(`Failed to read template file at ${templatePath}: ${error instanceof Error ? error.message : String(error)}`));
+    if (!existsSync(templatePath))
+        throw new Error(`Could not find task picker prompt template at ${templatePath}`);
 
-            return;
-        }
+    const promptTemplate = readFileSync(templatePath, 'utf8');
+    const preferences = readAutomationPreferences();
+    const taskDataJson = JSON.stringify(analysis.tasks, null, 2);
 
-        // Read automation preferences to get the base branch
-        const preferences = readAutomationPreferences();
-        
-        // Prepare task data for the prompt - just pass the raw tasks, let Claude decide
-        const taskDataJson = JSON.stringify(analysis.tasks, null, 2);
+    const prompt = promptTemplate
+        .replace('{{PROJECT_ID}}', projectId)
+        .replace('{{TASK_DATA}}', taskDataJson)
+        .replace('{{BASE_BRANCH}}', preferences.baseBranch);
 
-        const prompt = promptTemplate
-            .replace('{{PROJECT_ID}}', projectId)
-            .replace('{{TASK_DATA}}', taskDataJson)
-            .replace('{{BASE_BRANCH}}', preferences.baseBranch);
+    const promptFile = createTempPromptFile('task-picker');
+    writeFileSync(promptFile, prompt);
 
-        const tempPromptPath = `${mkdtempSync(join(process.cwd(), 'task-picker-prompt.'))}.md`;
-        writeFileSync(tempPromptPath, prompt);
+    await runClaudeCommand({ promptFile, verbose: false, streamOutput: false });
 
-        // Prepare Claude arguments
-        const claudeArgs = [
-            '-p', `Read and execute the instructions in this file: ${tempPromptPath}`,
-            '--dangerously-skip-permissions'
-        ];
-
-        console.log('[TaskPicker] Starting Claude task selection...');
-        const claude = spawn('claude', claudeArgs, { stdio: ['inherit', 'pipe', 'pipe'] });
-        claude.stdout.on('data', (data) => { process.stdout.write(data); });
-        claude.stderr.on('data', (data) => { process.stderr.write(data); });
-
-        let isCleanedUp = false;
-        const cleanupTempFile = () => {
-            if (!isCleanedUp) {
-                try {
-                    unlinkSync(tempPromptPath);
-                    isCleanedUp = true;
-                } catch (error) {
-                    // Only log error if it's not ENOENT (file already deleted)
-                    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
-                        console.error('[TaskPicker] Failed to clean up temp file:', error);
-                    }
-                }
-            }
-        };
-
-        claude.on('close', (code) => {
-            cleanupTempFile();
-
-            if (code === 0) {
-                console.log('[TaskPicker] Claude task selection completed successfully');
-                resolvePromise();
-            } else {
-                reject(new Error(`Claude command exited with code ${code}`));
-            }
-        });
-
-        claude.on('error', (error) => {
-            cleanupTempFile();
-            reject(error);
-        });
-    });
+    if (existsSync(promptFile))
+        unlinkSync(promptFile);
 }

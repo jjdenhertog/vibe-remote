@@ -195,11 +195,3 @@ export type ProjectBranchesResponse = {
   projectName: string;
   branches: BranchInfo[];
 };
-
-/**
- * API Configuration
- */
-export type ApiConfig = {
-  baseUrl: string;
-  timeout: number;
-};

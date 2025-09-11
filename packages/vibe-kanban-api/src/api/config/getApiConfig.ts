@@ -1,6 +1,5 @@
-import type { ApiConfig } from '../../types/api';
-import { getGlobalConfig } from './setApiConfig';
-
-export function getApiConfig(): ApiConfig {
-    return getGlobalConfig();
+export function getApiConfig() {
+    return {
+        baseUrl: 'http://localhost:9091',
+    };
 }
