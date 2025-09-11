@@ -51,7 +51,7 @@ class VibeKanbanCleanup {
             console.log('\n🔀 Auto-merge mode is "always" - attempting to merge PR...');
 
             try {
-                const mergeCommand = `gh pr merge --squash --body "Auto-merged by vibe-kanban" --delete-branch`;
+                const mergeCommand = `gh pr merge --merge --body "Auto-merged by vibe-kanban" --delete-branch`;
                 execSync(mergeCommand);
             } catch (_error) {
             }
