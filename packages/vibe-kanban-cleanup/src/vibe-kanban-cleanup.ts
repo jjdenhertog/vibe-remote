@@ -4,7 +4,7 @@ import { readAutomationPreferences } from "@vibe-remote/shared-utils/readAutomat
 import { fetchVibeKanbanContext, VibeKanbanContext } from "@vibe-remote/vibe-kanban-api/utils/fetchVibeKanbanContext";
 import { createPullRequest } from "./functions/createPullRequest";
 import { createPullRequestCLI } from "./functions/createPullRequestCLI";
-import { checkGitHubCLI, isAuthenticated } from '@vibe-remote/github';
+import { checkGitHubCLI, isAuthenticated } from '@vibe-remote/github/github';
 import { AutomationPreferences } from "@vibe-remote/shared-utils/readAutomationPreferences";
 import { execSync } from "node:child_process";
 import { runAutoMerge } from "./claude/runAutoMerge";

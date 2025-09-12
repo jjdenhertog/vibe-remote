@@ -1,4 +1,4 @@
-import { getBranchStatus as getGitHubBranchStatus } from '@vibe-remote/github';
+import { getBranchStatus as getGitHubBranchStatus } from '@vibe-remote/github/getBranchStatus';
 import type { BranchStatus } from '@vibe-remote/vibe-kanban-api/types/api';
 
 /**

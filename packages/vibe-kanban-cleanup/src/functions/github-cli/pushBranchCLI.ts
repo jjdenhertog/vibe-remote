@@ -1,4 +1,4 @@
-import { pushBranch as pushGitHubBranch } from '@vibe-remote/github';
+import { pushBranch as pushGitHubBranch } from '@vibe-remote/github/pushBranch';
 
 /**
  * Push branch using GitHub CLI instead of API

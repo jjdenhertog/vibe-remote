@@ -2,15 +2,14 @@
     "name": "@vibe-remote/github",
     "version": "1.0.0",
     "type": "module",
-    "main": "./dist/index.js",
-    "types": "./dist/index.d.ts",
     "exports": {
-        ".": "./dist/index.js",
         "./getBranchStatus": "./dist/branch/getBranchStatus.js",
+        "./listBranches": "./dist/branch/listBranches.js",
         "./pushBranch": "./dist/push/pushBranch.js",
         "./createPR": "./dist/pr/createPR.js",
         "./github": "./dist/github.js",
         "./types/BranchStatus": "./dist/types/BranchStatus.js",
+        "./types/BranchInfo": "./dist/types/BranchInfo.js",
         "./types/CreatePRRequest": "./dist/types/CreatePRRequest.js"
     },
     "scripts": {

@@ -1,4 +1,4 @@
-import { createPR as createGitHubPR } from '@vibe-remote/github';
+import { createPR as createGitHubPR } from '@vibe-remote/github/createPR';
 import type { CreatePRRequest } from '@vibe-remote/vibe-kanban-api/types/api';
 
 /**
@@ -10,11 +10,19 @@ export async function createPRCLI(attemptId: string, request: CreatePRRequest): 
     console.log(`📝 Creating PR for attempt: ${attemptId} (using GitHub CLI)`);
     
     try {
-        const prUrl = await createGitHubPR({
-            title: request.title,
-            body: request.body ?? undefined,
-            base_branch: request.base_branch ?? undefined
-        });
+        const prRequest: Parameters<typeof createGitHubPR>[0] = {
+            title: request.title
+        };
+        
+        if (request.body) {
+            prRequest.body = request.body;
+        }
+        
+        if (request.base_branch) {
+            prRequest.base_branch = request.base_branch;
+        }
+        
+        const prUrl = await createGitHubPR(prRequest);
         
         console.log(`✅ PR created via GitHub CLI: ${prUrl}`);
 
