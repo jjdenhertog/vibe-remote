@@ -1,0 +1,28 @@
+{
+    "name": "@vibe-remote/github",
+    "version": "1.0.0",
+    "type": "module",
+    "exports": {
+        "./*": {
+            "import": "./dist/*.js",
+            "types": "./dist/*.d.ts"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "tsc --build",
+        "clean": "rm -rf dist",
+        "type-check": "tsc --noEmit",
+        "lint": "eslint src"
+    },
+    "dependencies": {
+        "@vibe-remote/vibe-kanban-api": "workspace:*"
+    },
+    "devDependencies": {
+        "@types/node": "^20.0.0",
+        "eslint": "^8.0.0",
+        "typescript": "^5.0.0"
+    }
+}
