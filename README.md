@@ -3,16 +3,37 @@
 [![Docker Pulls](https://img.shields.io/docker/pulls/jjdenhertog/viberemote)](https://hub.docker.com/r/jjdenhertog/viberemote)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Remote AI development environment with Vibe-Kanban task management, Claude AI integration, and web-based configuration.
+Remote AI development environment with [Vibe-Kanban](https://www.vibekanban.com/) and [Claude-Flow](https://claude-flow.com/) integration. Enhanced with extra AI context and automations for fully autonomous development workflows.
 
 ## ✨ What's Included
 
 - **AI Context Configuration** - Web interface for project goals and coding standards  
 - **[Vibe-Kanban](https://www.vibekanban.com/)** - Visual task management with AI agents
 - **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** - Anthropic's official CLI
-- **Automated Workflows** - PR creation and code review automation
+- **Automated Workflows** - Review tasks before finishing, creating PRs, automatically merging PRs, and automatic task picking
 - **GitHub CLI** - Repository management
-- **Persistent Storage** - All auth/configs survive container recreations
+
+## 🤖 Vibe-Kanban Agents
+
+Three AI agents built on Claude are accessible within Vibe-Kanban:
+
+- **VIBE** - Standard Claude with extra context and selected automations
+- **VIBE_FLOW** - Uses [Claude-Flow](https://claude-flow.com/) for structured task execution  
+- **VIBE_PLAN** - Uses [Vibe-Kanban MCP](https://www.vibekanban.com/docs/mcp) to break down goals into tasks for automatic task selection
+
+## 💡 Working with AI Tools
+
+### Vibe-Kanban
+- Access the UI at port `9091` or the configured port
+- Create tasks and assign them to VIBE, VIBE_FLOW, or VIBE_PLAN agents
+- See [documentation](https://www.vibekanban.com/docs) for advanced features
+
+### Web Configuration Interface
+- Visit `http://localhost:9092` to configure AI context and automations
+- Set up project goals, coding standards, and development preferences  
+- Configure automated workflows: code review, PR creation, auto-merging, and task picking
+- Enable autonomous development mode with intelligent task selection
+- All settings persist across container restarts
 
 ## 🚀 Quick Start
 
@@ -138,25 +159,10 @@ git clone git@github.com:user/repo.git .
 # or
 gh repo clone user/repo .
 
-# 5. Initialize project
-init-project
-
-# 6. Configure AI context and automations
+# 5. Configure AI context and automations
 # Visit http://localhost:9092 to set up project goals and coding standards
 ```
 
-## 💡 Working with AI Tools
-
-### Vibe-Kanban
-- Access the UI at port `9091` or the configured port
-- Create tasks and let AI agents work on them
-- See [documentation](https://www.vibekanban.com/docs) for advanced features
-
-### Web Configuration Interface
-- Visit `http://localhost:9092` to configure AI context and automations
-- Set up project goals, coding standards, and development preferences  
-- Enable automatic PR creation and code review workflows
-- All settings persist across container restarts
 
 ## 🔒 Enhanced Security with Firewall
 
@@ -217,12 +223,6 @@ Also update:
     ├── .vibe-kanban/ # Task management data
     └── preferences/  # AI context and automation settings
 ```
-
-**Benefits:**
-- **Separate volumes** for credentials, projects, and data
-- **Easy backup** - backup only what you need
-- **Better security** - credentials isolated from project files  
-- **Flexible management** - each volume can be managed independently
 
 ## 📚 Tool Documentation
 
