@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import type { BranchInfo } from '@vibe-remote/vibe-kanban-api/types/api';
 
 const VIBE_KANBAN_BASE_URL = 'http://localhost:9091';
 
@@ -28,10 +29,15 @@ export async function GET() {
         const branchesData = await branchesResponse.json();
         const branches = branchesData.data;
         
+        // Filter out vibe kanban auto-created branches (starting with vk- or vk/)
+        const filteredBranches = branches.filter((branch: BranchInfo) => 
+            !branch.name.startsWith('vk-') && !branch.name.startsWith('vk/')
+        );
+        
         return NextResponse.json({
             projectId: project.id,
             projectName: project.name,
-            branches
+            branches: filteredBranches
         });
     } catch (error) {
         console.error('Error fetching project branches:', error);
