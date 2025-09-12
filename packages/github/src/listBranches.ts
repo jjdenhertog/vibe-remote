@@ -1,5 +1,5 @@
 import { execSync } from 'node:child_process';
-import type { BranchInfo } from '../types/BranchInfo';
+import type { BranchInfo } from './BranchInfo';
 
 function parseBranchOutput(output: string, currentBranch: string, isRemote: boolean): BranchInfo[] {
     const result: BranchInfo[] = [];

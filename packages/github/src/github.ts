@@ -1,5 +1,4 @@
 import { execSync } from 'node:child_process';
-import { GitHubCLIError, GitHubCLIErrorCode } from './errors';
 
 export function checkGitHubCLI(): boolean {
     try {
@@ -22,25 +21,7 @@ export function isAuthenticated(): boolean {
 }
 
 export function getCurrentBranch(): string {
-    try {
-        const branch = execSync('git branch --show-current', { encoding: 'utf8' }).trim();
-        if (!branch) {
-            throw new GitHubCLIError(
-                GitHubCLIErrorCode.BRANCH_NOT_FOUND,
-                'No current branch found'
-            );
-        }
-
-        return branch;
-    } catch (error) {
-        if (error instanceof GitHubCLIError) throw error;
-
-        throw new GitHubCLIError(
-            GitHubCLIErrorCode.COMMAND_FAILED,
-            'Failed to get current branch',
-            error
-        );
-    }
+    return execSync('git branch --show-current', { encoding: 'utf8' }).trim();
 }
 
 export function getDefaultBranch(): string {

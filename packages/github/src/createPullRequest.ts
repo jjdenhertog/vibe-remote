@@ -1,27 +1,23 @@
 import { execSync } from 'node:child_process';
-import type { CreatePRRequest } from '../types/CreatePRRequest';
-import { GitHubCLIError, GitHubCLIErrorCode } from '../errors';
+import type { VibeKanbanContext } from '@vibe-remote/vibe-kanban-api/utils/fetchVibeKanbanContext';
 
-export async function createPR(request: CreatePRRequest): Promise<string> {
+/**
+ * Create a pull request using GitHub CLI with VibeKanban context
+ * This replaces the GitHub API call for PR creation
+ */
+export async function createPullRequest(context: VibeKanbanContext): Promise<string> {
     try {
         // Ensure we're authenticated with GitHub CLI
         execSync('gh auth status', { encoding: 'utf8' });
-    } catch (error) {
-        throw new GitHubCLIError(
-            GitHubCLIErrorCode.NOT_AUTHENTICATED,
-            'GitHub CLI not authenticated. Please run: gh auth login',
-            error
-        );
+    } catch {
+        throw new Error('GitHub CLI not authenticated. Please run: gh auth login');
     }
     
-    // Get current branch name
-    const currentBranch = execSync('git branch --show-current', { encoding: 'utf8' }).trim();
+    // Use branch from context
+    const currentBranch = context.taskAttempt.branch || execSync('git branch --show-current', { encoding: 'utf8' }).trim();
     
     if (!currentBranch) {
-        throw new GitHubCLIError(
-            GitHubCLIErrorCode.BRANCH_NOT_FOUND,
-            'No current branch found'
-        );
+        throw new Error('No current branch found');
     }
     
     // Ensure branch is pushed first
@@ -38,21 +34,15 @@ export async function createPR(request: CreatePRRequest): Promise<string> {
     // Build PR creation command
     const args: string[] = ['pr', 'create'];
     
-    // Add title (required)
-    args.push('--title', JSON.stringify(request.title));
+    // Use task title and description from context
+    args.push('--title', JSON.stringify(context.task.title));
     
-    // Add body if provided
-    if (request.body) {
-        args.push('--body', JSON.stringify(request.body));
+    if (context.task.description) {
+        args.push('--body', JSON.stringify(context.task.description));
     }
     
-    // Add base branch if provided
-    if (request.base_branch) {
-        args.push('--base', request.base_branch);
-    }
-    
-    // Add head branch
-    args.push('--head', currentBranch);
+    // Use base branch from task attempt
+    args.push('--base', context.taskAttempt.base_branch, '--head', currentBranch);
     
     console.log('Creating pull request...');
     
@@ -86,10 +76,6 @@ export async function createPR(request: CreatePRRequest): Promise<string> {
             // Ignore errors checking for existing PR
         }
         
-        throw new GitHubCLIError(
-            GitHubCLIErrorCode.COMMAND_FAILED,
-            `Failed to create pull request: ${String(error)}`,
-            error
-        );
+        throw new Error(`Failed to create pull request: ${String(error)}`);
     }
 }

@@ -3,22 +3,23 @@
     "version": "1.0.0",
     "type": "module",
     "exports": {
-        "./getBranchStatus": "./dist/branch/getBranchStatus.js",
-        "./listBranches": "./dist/branch/listBranches.js",
-        "./pushBranch": "./dist/push/pushBranch.js",
-        "./createPR": "./dist/pr/createPR.js",
-        "./github": "./dist/github.js",
-        "./types/BranchStatus": "./dist/types/BranchStatus.js",
-        "./types/BranchInfo": "./dist/types/BranchInfo.js",
-        "./types/CreatePRRequest": "./dist/types/CreatePRRequest.js"
+        "./*": {
+            "import": "./dist/*.js",
+            "types": "./dist/*.d.ts"
+        }
     },
+    "files": [
+        "dist"
+    ],
     "scripts": {
         "build": "tsc --build",
         "clean": "rm -rf dist",
         "type-check": "tsc --noEmit",
         "lint": "eslint src"
     },
-    "dependencies": {},
+    "dependencies": {
+        "@vibe-remote/vibe-kanban-api": "workspace:*"
+    },
     "devDependencies": {
         "@types/node": "^20.0.0",
         "eslint": "^8.0.0",
