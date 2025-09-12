@@ -72,7 +72,8 @@ Evaluates TODO tasks based on:
 
 - **Task Prefixes**
   - `[AI]` - Tasks suitable for AI/automated implementation (highest priority)
-  - `[HUMAN]` - Tasks requiring human intervention (lower priority)
+  - `[AI/HUMAN]` - Tasks that AI can execute AFTER human provides required input (medium priority)
+  - `[HUMAN]` - Tasks requiring human intervention (skipped by taskpicker)
   
 - **Dependencies**
   - Tasks that block other work are prioritized
@@ -86,7 +87,14 @@ Evaluates TODO tasks based on:
   - Considers current work distribution
   - Avoids overloading any phase
 
-### 4. Task Selection & Update
+### 4. AI/HUMAN Task Handling
+For `[AI/HUMAN]` tasks:
+- The taskpicker checks if the "# HUMAN INPUT NEEDED" section has been answered
+- If human input is pending, the task is skipped
+- If human has provided responses (marked with "HUMAN RESPONSE:" or "ANSWERED:"), the task becomes eligible for AI execution
+- This allows AI to work on complex tasks that need human clarification without blocking on simple questions
+
+### 5. Task Selection & Update
 - Selects the optimal task based on analysis
 - Updates task status to "inprogress" using `mcp__vibe_kanban__update_task`
 - Provides clear reasoning for the selection

@@ -20,7 +20,10 @@ The following tasks have been fetched from the Vibe Kanban API.
 ### Selection Criteria:
 
 1. **Task Status**: Only consider tasks with status "todo"
-2. **Task Type**: Prefer [AI] tasks over [HUMAN] tasks for automated execution
+2. **Task Type**: 
+   - **[AI]** tasks: Can be executed autonomously - PREFERRED
+   - **[HUMAN]** tasks: Require human execution - SKIP these
+   - **[AI/HUMAN]** tasks: Can be executed by AI ONLY IF "# HUMAN INPUT NEEDED" section has been answered
 3. **Dependencies**: Avoid tasks that are blocked by incomplete dependencies
 4. **Priority**: Consider priority markers (Priority: high/medium/low)
 5. **Effort**: Balance impact vs effort (Estimated effort: small/medium/large)
@@ -30,9 +33,13 @@ The following tasks have been fetched from the Vibe Kanban API.
 ### Analysis Approach:
 
 1. **Parse Task Details**: Look for priority, effort, type, and dependency markers in descriptions
-2. **Check Dependencies**: Ensure any mentioned dependencies are completed
-3. **Evaluate Impact**: Consider which task would provide the most value
-4. **Make Strategic Choice**: Select the task that best balances priority, effort, and project needs
+2. **Check Task Type**:
+   - For [AI/HUMAN] tasks: Check if "# HUMAN INPUT NEEDED" section exists and has been answered
+   - If questions remain unanswered, SKIP the task
+   - Look for text like "HUMAN RESPONSE:" or "ANSWERED:" indicating human input was provided
+3. **Check Dependencies**: Ensure any mentioned dependencies are completed
+4. **Evaluate Impact**: Consider which task would provide the most value
+5. **Make Strategic Choice**: Select the task that best balances priority, effort, and project needs
 
 ### Action to Take
 
@@ -65,9 +72,10 @@ TASK SELECTION DECISION
 ## Selected Task:
 - **Task ID:** [task-id]
 - **Title:** [task-title]
-- **Type:** [AI/HUMAN/UNKNOWN from description]
+- **Type:** [AI/HUMAN/AI-HUMAN from description]
 - **Priority:** [HIGH/MEDIUM/LOW from description or null]
 - **Estimated Effort:** [Small/Medium/Large from description or null]
+- **Human Input Status:** [For AI/HUMAN tasks: "Answered" or "Pending"]
 
 ## Selection Reasoning:
 [Explain why this task was selected over others - consider priority, effort, dependencies, type]
@@ -82,7 +90,8 @@ TASK SELECTION DECISION
 - 📋 The task data includes ALL available project tasks for context
 - 🎯 Make an intelligent choice based on the selection criteria above
 - ⚡ Only select tasks with status "todo" that are not blocked by dependencies
-- 🤖 Prefer [AI] tasks over [HUMAN] tasks for automated execution
-- 🔍 Look for markers in task descriptions: "Priority:", "Estimated effort:", "Type: [AI]", "Dependencies:"
+- 🤖 Task type priority: [AI] > [AI/HUMAN with answered questions] > Skip [HUMAN] and [AI/HUMAN with pending questions]
+- 🔍 Look for markers in task descriptions: "Priority:", "Estimated effort:", "Type: [AI]", "Type: [AI/HUMAN]", "Dependencies:"
+- 📝 For [AI/HUMAN] tasks: Check if "# HUMAN INPUT NEEDED" section has responses before selecting
 
 **Begin by analyzing the available tasks and making your intelligent selection.**
