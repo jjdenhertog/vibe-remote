@@ -75,6 +75,10 @@ services:
       # Optional: Set timezone
       - TZ=UTC
       
+      # Optional: Vibe Kanban URL for web interface iframe
+      # Defaults to http://localhost:9091
+      - NEXT_PUBLIC_VIBE_KANBAN_URL=http://localhost:9091
+      
     ports:
       # CHANGE THESE: Use unique ports for each project
       - "9090:9090"       # SSH
@@ -116,6 +120,7 @@ services:
       - DEVELOPER_PASSWORD=changeme
       - GIT_USERNAME=Your Name
       - GIT_USEREMAIL=your@email.com
+      - NEXT_PUBLIC_VIBE_KANBAN_URL=http://localhost:9091
     
     ports:
       - "9090:9090"     # SSH
@@ -163,6 +168,24 @@ gh repo clone user/repo .
 # Visit http://localhost:9092 to set up project goals and coding standards
 ```
 
+<<<<<<< HEAD
+=======
+## 💡 Working with AI Tools
+
+### Vibe-Kanban
+- Access the UI at port `9091` or the configured port
+- Create tasks and let AI agents work on them
+- See [documentation](https://www.vibekanban.com/docs) for advanced features
+
+### Web Configuration Interface
+- Visit `http://localhost:9092` to access the unified web interface
+- **Top Navigation Bar** for easy switching between:
+  - **AI Context**: Configure project goals and coding standards
+  - **Automations**: Set up PR creation and code review workflows
+  - **Vibe Kanban**: Embedded task management interface
+- All settings persist across container restarts
+- Integrated Vibe Kanban view - no need to switch browser tabs
+>>>>>>> 63f7bc74e2465704f97ecf6270c07178b793e086
 
 ## 🔒 Enhanced Security with Firewall
 
