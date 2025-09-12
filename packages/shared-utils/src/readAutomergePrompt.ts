@@ -30,6 +30,7 @@ DECISION: MERGE
 REASON: [brief why]
 
 gh pr merge --merge --body "Auto-merged: [X]/10" --delete-branch
+vibe-kanban-sync-status
 \`\`\`
 
 ### If NOT MERGING:
