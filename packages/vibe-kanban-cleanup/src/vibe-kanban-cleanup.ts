@@ -3,6 +3,8 @@
 import { readAutomationPreferences } from "@vibe-remote/shared-utils/readAutomationPreferences";
 import { fetchVibeKanbanContext, VibeKanbanContext } from "@vibe-remote/vibe-kanban-api/utils/fetchVibeKanbanContext";
 import { createPullRequest } from "./functions/createPullRequest";
+import { createPullRequestWithCLI } from "./functions/createPullRequestWithCLI";
+import { checkGitHubCLI, isAuthenticated } from '@vibe-remote/github/github';
 import { AutomationPreferences } from "@vibe-remote/shared-utils/readAutomationPreferences";
 import { execSync } from "node:child_process";
 import { runAutoMerge } from "./claude/runAutoMerge";
@@ -25,7 +27,17 @@ class VibeKanbanCleanup {
             const preferences = readAutomationPreferences();
 
             if (preferences.automaticallyCreatePR) {
-                const prUrl = await createPullRequest(context);
+                // Check if GitHub CLI is available and use it, otherwise fall back to API
+                let prUrl: string;
+                
+                if (checkGitHubCLI() && isAuthenticated()) {
+                    console.log('🎯 Using hybrid approach: Vibe Kanban API for Git + GitHub CLI for PRs...');
+                    prUrl = await createPullRequestWithCLI(context);
+                } else {
+                    console.log('📡 Falling back to Vibe Kanban API (GitHub CLI not available or not authenticated)...');
+                    prUrl = await createPullRequest(context);
+                }
+
                 console.log(`\n✅ PR created: ${prUrl}`);
 
                 // Handle auto-merge based on preferences
