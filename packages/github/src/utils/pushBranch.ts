@@ -9,6 +9,16 @@ export async function pushBranch(currentBranch: string): Promise<void> {
     if(!isAuthenticated())
         throw new Error('GitHub CLI not authenticated. Please run: gh auth login');
     
+    // Setup git to use GitHub CLI credentials
+    try {
+        execSync('gh auth setup-git', {
+            encoding: 'utf8',
+            stdio: 'pipe' // Hide output unless error
+        });
+    } catch (error) {
+        console.warn('Warning: Could not setup git authentication, continuing anyway...', error);
+    }
+    
     // Get current branch name
     console.log(`Pushing branch '${currentBranch}' to GitHub...`);
     

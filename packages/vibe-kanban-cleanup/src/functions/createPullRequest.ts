@@ -37,6 +37,15 @@ export async function createPullRequest(vibeContext: VibeKanbanContext): Promise
         // Create new PR if none exists using GitHub CLI
         console.log('📝 Creating new PR using GitHub CLI...');
         
+        // Check if we need to push the branch before creating PR
+        const branchStatus = getBranchStatus(vibeContext.taskAttempt.branch);
+        
+        if (branchStatus.needsPush) {
+            console.log(`📤 Pushing ${branchStatus.commitsAhead} commits before creating PR...`);
+            await pushBranch(vibeContext.taskAttempt.branch);
+            console.log('✅ Successfully pushed branch to remote');
+        }
+        
         return await githubCreatePullRequest(vibeContext);
 
     } catch (error) {

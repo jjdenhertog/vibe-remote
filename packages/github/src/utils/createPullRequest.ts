@@ -51,8 +51,6 @@ export async function createPullRequest(context: VibeKanbanContext): Promise<str
     if (context.task.description)
         args.push('--body', JSON.stringify(context.task.description));
 
-    args.push('--base', context.taskAttempt.base_branch, '--head', currentBranch);
-
     console.log('Creating pull request...');
 
     try {
