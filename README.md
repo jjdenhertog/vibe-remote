@@ -232,9 +232,7 @@ Also update:
 
 - **Vibe-Kanban**: [Getting Started](https://www.vibekanban.com/docs)
 - **Claude Code**: [Setup Guide](https://docs.anthropic.com/en/docs/claude-code/setup)
-- **Advanced Configuration**: [CLAUDE.md](CLAUDE.md)
 - **Security Setup**: [FIREWALL.md](FIREWALL.md)
-- **API Reference**: [VIBE_KANBAN_API.md](VIBE_KANBAN_API.md)
 
 ## 📄 License
 
