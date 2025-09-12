@@ -67,9 +67,9 @@ export function runClaudeCommand(options: RunClaudeCommandOptions): Promise<void
 
             if (showProgress) {
                 parseProgressMessage(chunk);
+            } else {
+                process.stdout.write(data);
             }
-
-            process.stdout.write(data);
         });
 
         claude.stderr.on('data', (data) => {
