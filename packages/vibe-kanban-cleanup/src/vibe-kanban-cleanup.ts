@@ -55,7 +55,14 @@ class VibeKanbanCleanup {
             try {
                 const mergeCommand = `gh pr merge --merge --body "Auto-merged by vibe-kanban" --delete-branch`;
                 execSync(mergeCommand);
-            } catch (_error) {
+                console.log('✅ PR successfully merged and branch deleted');
+            } catch (error) {
+                const errorMessage = String(error);
+                if (errorMessage.includes("'main' is already checked out")) {
+                    console.log('✅ Auto-merge completed (worktree limitation handled)');
+                } else {
+                    console.log(`⚠️ Auto-merge failed: ${errorMessage}`);
+                }
             }
 
             return;
