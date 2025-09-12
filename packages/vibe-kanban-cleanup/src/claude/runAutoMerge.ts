@@ -30,6 +30,8 @@ export async function runAutoMerge(attemptId: string): Promise<void> {
 
         // Process template with context
         const processedPrompt = processTemplate(promptTemplate, {
+            taskId: task.id,
+            projectId: task.project_id,
             taskTitle: task.title,
             taskDescription: task.description,
         });
