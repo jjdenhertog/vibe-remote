@@ -11,6 +11,9 @@ USERNAME=${USERNAME:-developer}
 USER_ID=${USER_ID:-1000}
 GROUP_ID=${GROUP_ID:-1000}
 
+# Export Vibe Kanban URL for the web interface
+export NEXT_PUBLIC_VIBE_KANBAN_URL=${NEXT_PUBLIC_VIBE_KANBAN_URL:-http://localhost:9091}
+
 # Update user ID and group ID if they differ from build args
 CURRENT_UID=$(id -u ${USERNAME} 2>/dev/null || echo "")
 CURRENT_GID=$(id -g ${USERNAME} 2>/dev/null || echo "")
