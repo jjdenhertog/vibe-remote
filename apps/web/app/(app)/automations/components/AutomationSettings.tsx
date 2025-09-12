@@ -17,7 +17,7 @@ type AutomationSettings = {
 
 type AutomationSettingsProps = {
     readonly settings: AutomationSettings;
-    readonly branchData: ProjectBranchesResponse | null;
+    readonly branchData: ProjectBranchesResponse | undefined;
     readonly branchesLoading: boolean;
     readonly reviewPrompt: string;
     readonly automergePrompt: string;

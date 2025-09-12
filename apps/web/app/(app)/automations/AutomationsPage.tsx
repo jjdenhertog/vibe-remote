@@ -33,7 +33,7 @@ export const AutomationsPage = () => {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [jsonError, setJsonError] = useState<string | null>(null);
-    const [branchData, setBranchData] = useState<ProjectBranchesResponse | null>(null);
+    const [branchData, setBranchData] = useState<ProjectBranchesResponse>();
     const [branchesLoading, setBranchesLoading] = useState(false);
     const [showJsonEditor, setShowJsonEditor] = useState(false);
 

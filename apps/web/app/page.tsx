@@ -1,7 +1,14 @@
 import Link from "next/link";
-import { Brain, Cog, Kanban } from "lucide-react";
+import { Brain, Cog, Kanban, ExternalLink } from "lucide-react";
+import { unstable_noStore as noStore } from 'next/cache';
 
 export default function Home() {
+    // Force dynamic rendering to read runtime environment variables
+    noStore();
+    
+    // Access environment variable on the server at runtime
+    const vibeKanbanUrl = process.env.VIBE_KANBAN_URL;
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
             <div className="container mx-auto px-6 py-12">
@@ -86,38 +93,80 @@ export default function Home() {
                     </Link>
 
                     {/* Vibe Kanban Card */}
-                    <Link href="/vibe-kanban" className="group md:col-span-2 lg:col-span-1">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer transform group-hover:scale-105">
-                            <div className="p-8">
-                                <div className="flex items-center mb-6">
-                                    <div className="p-3 bg-purple-100 dark:bg-purple-900 rounded-lg mr-4">
-                                        <Kanban className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+                    {vibeKanbanUrl ? (
+                        <a 
+                            href={vibeKanbanUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="group md:col-span-2 lg:col-span-1"
+                        >
+                            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer transform group-hover:scale-105">
+                                <div className="p-8">
+                                    <div className="flex items-center mb-6">
+                                        <div className="p-3 bg-purple-100 dark:bg-purple-900 rounded-lg mr-4">
+                                            <Kanban className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+                                        </div>
+                                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                            Vibe Kanban
+                                            <ExternalLink className="w-5 h-5 opacity-60" />
+                                        </h2>
                                     </div>
-                                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                                        Vibe Kanban
-                                    </h2>
+                                    <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
+                                        Visual task management with three specialized AI agents: VIBE, VIBE_FLOW, 
+                                        and VIBE_PLAN for different development workflows.
+                                    </p>
+                                    <div className="space-y-3 mb-8">
+                                        <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                                            <div className="w-2 h-2 bg-purple-500 rounded-full mr-3" />
+                                            Three Specialized AI Agents
+                                        </div>
+                                        <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                                            <div className="w-2 h-2 bg-purple-500 rounded-full mr-3" />
+                                            Claude Code Integration
+                                        </div>
+                                    </div>
+                                    <div className="inline-flex items-center justify-center w-full px-6 py-3 bg-purple-600 text-white rounded-lg group-hover:bg-purple-700 transition-colors duration-200 font-medium">
+                                        <Kanban className="w-5 h-5 mr-2" />
+                                        Open Vibe Kanban
+                                        <ExternalLink className="w-4 h-4 ml-1" />
+                                    </div>
                                 </div>
-                                <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
-                                    Visual task management with three specialized AI agents: VIBE, VIBE_FLOW, 
-                                    and VIBE_PLAN for different development workflows.
-                                </p>
-                                <div className="space-y-3 mb-8">
-                                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                                        <div className="w-2 h-2 bg-purple-500 rounded-full mr-3" />
-                                        Three Specialized AI Agents
+                            </div>
+                        </a>
+                    ) : (
+                        <div className="group md:col-span-2 lg:col-span-1 opacity-50">
+                            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg transition-all duration-300 overflow-hidden cursor-not-allowed">
+                                <div className="p-8">
+                                    <div className="flex items-center mb-6">
+                                        <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg mr-4">
+                                            <Kanban className="w-8 h-8 text-gray-400 dark:text-gray-600" />
+                                        </div>
+                                        <h2 className="text-2xl font-bold text-gray-400 dark:text-gray-600">
+                                            Vibe Kanban
+                                        </h2>
                                     </div>
-                                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                                        <div className="w-2 h-2 bg-purple-500 rounded-full mr-3" />
-                                        Claude Code Integration
+                                    <p className="text-gray-400 dark:text-gray-600 mb-6 leading-relaxed">
+                                        Visual task management with three specialized AI agents: VIBE, VIBE_FLOW, 
+                                        and VIBE_PLAN for different development workflows.
+                                    </p>
+                                    <div className="space-y-3 mb-8">
+                                        <div className="flex items-center text-sm text-gray-400 dark:text-gray-600">
+                                            <div className="w-2 h-2 bg-gray-400 rounded-full mr-3" />
+                                            Three Specialized AI Agents
+                                        </div>
+                                        <div className="flex items-center text-sm text-gray-400 dark:text-gray-600">
+                                            <div className="w-2 h-2 bg-gray-400 rounded-full mr-3" />
+                                            Claude Code Integration
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="inline-flex items-center justify-center w-full px-6 py-3 bg-purple-600 text-white rounded-lg group-hover:bg-purple-700 transition-colors duration-200 font-medium">
-                                    <Kanban className="w-5 h-5 mr-2" />
-                                    Open Vibe Kanban
+                                    <div className="inline-flex items-center justify-center w-full px-6 py-3 bg-gray-400 text-gray-200 rounded-lg font-medium cursor-not-allowed">
+                                        <Kanban className="w-5 h-5 mr-2" />
+                                        VIBE_KANBAN_URL not set
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </Link>
+                    )}
                 </div>
 
                 {/* Feature Overview */}

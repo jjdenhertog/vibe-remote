@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import ConditionalLayout from "@/components/layout/ConditionalLayout";
 import "./globals.css";
 
 // Fallback fonts when Google Fonts are not available
@@ -25,10 +24,8 @@ export default function RootLayout({
         <html lang="en">
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-                <ConditionalLayout>
-                    {children}
-                </ConditionalLayout>
+            >
+                {children}
             </body>
         </html>
     );
