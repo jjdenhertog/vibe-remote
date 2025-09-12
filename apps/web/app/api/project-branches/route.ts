@@ -31,7 +31,7 @@ export async function GET() {
         
         // Filter out vibe kanban auto-created branches (starting with vk- or vk/)
         const filteredBranches = branches.filter((branch: BranchInfo) => 
-            !branch.name.startsWith('vk-') && !branch.name.startsWith('vk/')
+            !branch.name.startsWith('vk-') && !branch.name.startsWith('vk/') && !branch.name.startsWith('origin/vk/') && !branch.name.startsWith('origin/vk-')
         );
         
         return NextResponse.json({
