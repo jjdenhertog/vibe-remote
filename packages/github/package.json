@@ -1,0 +1,28 @@
+{
+    "name": "@vibe-remote/github",
+    "version": "1.0.0",
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": "./dist/index.js",
+        "./getBranchStatus": "./dist/branch/getBranchStatus.js",
+        "./pushBranch": "./dist/push/pushBranch.js",
+        "./createPR": "./dist/pr/createPR.js",
+        "./github": "./dist/github.js",
+        "./types/BranchStatus": "./dist/types/BranchStatus.js",
+        "./types/CreatePRRequest": "./dist/types/CreatePRRequest.js"
+    },
+    "scripts": {
+        "build": "tsc --build",
+        "clean": "rm -rf dist",
+        "type-check": "tsc --noEmit",
+        "lint": "eslint src"
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "@types/node": "^20.0.0",
+        "eslint": "^8.0.0",
+        "typescript": "^5.0.0"
+    }
+}
