@@ -2,6 +2,10 @@ import { existsSync, readFileSync } from 'node:fs';
 
 const DEFAULT_AUTOMERGE_PROMPT = `Review this pull request and decide if it should be automatically merged.
 
+Task ID: {{taskId}}
+Project ID: {{projectId}}
+Task Title: {{taskTitle}}
+
 ## Quick Assessment (Score 1-10):
 
 **1. Code Quality (40%)**
@@ -30,7 +34,9 @@ DECISION: MERGE
 REASON: [brief why]
 
 gh pr merge --merge --body "Auto-merged: [X]/10" --delete-branch
-vibe-kanban-sync-status
+
+# Update task status to done using vibe-kanban MCP
+# Use the mcp__vibe_kanban__update_task tool with project_id: "{{projectId}}" and task_id: "{{taskId}}" to set status to 'done'
 \`\`\`
 
 ### If NOT MERGING:
