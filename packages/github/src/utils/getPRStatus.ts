@@ -1,12 +1,12 @@
 import { execSync } from 'node:child_process';
-import type { MergeInfo } from './BranchStatus';
+import type { MergeInfo } from "../types/MergeInfo";
 
 /**
  * Get PR status for a branch using GitHub CLI
  * This ONLY handles GitHub PR information, not Git operations
  */
-export async function getPRStatus(branchName?: string, baseBranch = 'main'): Promise<MergeInfo[]> {
-    const currentBranch = branchName || execSync('git branch --show-current', { encoding: 'utf8' }).trim();
+export async function getPRStatus(branchName: string): Promise<MergeInfo[]> {
+    const currentBranch = branchName;
     const merges: MergeInfo[] = [];
     
     try {
@@ -26,7 +26,6 @@ export async function getPRStatus(branchName?: string, baseBranch = 'main'): Pro
                 id: `pr-${pr.number}`,
                 task_attempt_id: currentBranch,
                 created_at: new Date().toISOString(),
-                target_branch_name: baseBranch,
                 pr_info: {
                     number: pr.number,
                     url: pr.url,

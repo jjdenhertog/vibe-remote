@@ -89,14 +89,5 @@ export function runClaudeCommand(options: RunClaudeCommandOptions): Promise<void
             reject(error);
         });
 
-        // Add timeout to prevent indefinite hanging
-        const timeout = setTimeout(() => {
-            claude.kill('SIGTERM');
-            reject(new Error('Claude command timed out after 5 minutes'));
-        }, 5 * 60 * 1000); // 5 minutes
-
-        claude.on('close', () => {
-            clearTimeout(timeout);
-        });
     });
 }

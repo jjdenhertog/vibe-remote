@@ -1,20 +1,15 @@
 import { execSync } from 'node:child_process';
+import { checkGitHubCLI } from './checkGitHubCLI';
+import { isAuthenticated } from './isAuthenticated';
 
-export async function pushBranch(): Promise<void> {
-    try {
-        // Ensure we're authenticated with GitHub CLI
-        execSync('gh auth status', { encoding: 'utf8' });
-    } catch {
+export async function pushBranch(currentBranch: string): Promise<void> {
+    if(!checkGitHubCLI())
+        throw new Error('GitHub CLI not installed. Please install it from https://cli.github.com/');
+        
+    if(!isAuthenticated())
         throw new Error('GitHub CLI not authenticated. Please run: gh auth login');
-    }
     
     // Get current branch name
-    const currentBranch = execSync('git branch --show-current', { encoding: 'utf8' }).trim();
-    
-    if (!currentBranch) {
-        throw new Error('No current branch found');
-    }
-    
     console.log(`Pushing branch '${currentBranch}' to GitHub...`);
     
     try {
