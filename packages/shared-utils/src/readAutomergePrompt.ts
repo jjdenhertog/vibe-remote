@@ -2,9 +2,12 @@ import { existsSync, readFileSync } from 'node:fs';
 
 const DEFAULT_AUTOMERGE_PROMPT = `Review this pull request and decide if it should be automatically merged.
 
-Task ID: {{taskId}}
-Project ID: {{projectId}}
-Task Title: {{taskTitle}}
+# IMPORTANT
+When you choose to merge it WILL throw an error about the branch trying to check out. This is expected and SHOULD BE IGNORED. This is caused by the fact that we're calling this from a worktree.
+
+Task ID: {{TASK_ID}}
+Project ID: {{PROJECT_ID}}
+Task Title: {{TASK_TITLE}}
 
 ## Quick Assessment (Score 1-10):
 
@@ -35,9 +38,10 @@ REASON: [brief why]
 
 gh pr merge --merge --body "Auto-merged: [X]/10" --delete-branch
 
-# Update task status to done using vibe-kanban MCP
-# Use the mcp__vibe_kanban__update_task tool with project_id: "{{projectId}}" and task_id: "{{taskId}}" to set status to 'done'
 \`\`\`
+
+# When merge is completed
+Use the mcp__vibe_kanban__update_task tool with project_id: "{{projectId}}" and task_id: "{{taskId}}" to set status to 'done'
 
 ### If NOT MERGING:
 \`\`\`
@@ -45,6 +49,8 @@ SCORE: [X]/10
 DECISION: DO NOT MERGE
 REASON: [main issues]
 \`\`\`
+
+
 
 Be pragmatic - focus on shipping working code, not perfection.`;
 
