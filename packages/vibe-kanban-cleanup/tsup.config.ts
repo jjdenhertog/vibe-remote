@@ -3,8 +3,7 @@ import { defineConfig } from 'tsup';
 export default defineConfig({
   // Entry points - the main CLI executables
   entry: {
-    'vibe-kanban-cleanup': 'src/vibe-kanban-cleanup.ts',
-    'vibe-kanban-sync-status': 'src/vibe-kanban-sync-status.ts'
+    'vibe-kanban-cleanup': 'src/vibe-kanban-cleanup.ts'
   },
   
   // Output single bundled files (not split)
