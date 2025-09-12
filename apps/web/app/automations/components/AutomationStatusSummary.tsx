@@ -63,12 +63,14 @@ export const AutomationStatusSummary: React.FC<AutomationStatusSummaryProps> = (
                         Task Picking: {settings.automaticTaskPicking ? 'Enabled' : 'Disabled'}
                     </span>
                 </div>
-                <div className="flex items-center">
-                    <span className="w-2 h-2 rounded-full mr-2 bg-blue-500" />
-                    <span className="text-blue-800 dark:text-blue-200">
-                        Base Branch: {settings.baseBranch}
-                    </span>
-                </div>
+                {!!settings.automaticTaskPicking && (
+                    <div className="flex items-center">
+                        <span className="w-2 h-2 rounded-full mr-2 bg-blue-500" />
+                        <span className="text-blue-800 dark:text-blue-200">
+                            Base Branch: {settings.baseBranch}
+                        </span>
+                    </div>
+                )}
             </div>
         </div>
     );
