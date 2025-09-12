@@ -251,18 +251,17 @@ export const AutomationSettings: React.FC<AutomationSettingsProps> = ({
                     </button>
                 </div>
             </div>
-
-            {/* Base Branch Selection - Only visible when automatic task picking is enabled */}
+            {/* Base Branch Selection - Only show when automatic task picking is enabled */}
             {!!settings.automaticTaskPicking && (
                 <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 ml-8 border-l-4 border-purple-500">
                     <div className="flex items-start">
                         <GitBranch className="w-5 h-5 text-orange-600 dark:text-orange-400 mr-3 mt-1" />
                         <div className="flex-1">
                             <h3 className="font-medium text-gray-900 dark:text-white mb-2">
-                                Base Branch for Tasks
+                                Base Branch for Auto Task Picker
                             </h3>
                             <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
-                                Select the branch to use as base when starting new tasks
+                                Select the branch to use as base when automatically starting new tasks
                             </p>
                             
                             {branchesLoading ? (
