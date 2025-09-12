@@ -41,7 +41,7 @@ gh pr merge --merge --body "Auto-merged: [X]/10" --delete-branch
 \`\`\`
 
 # When merge is completed
-Use the mcp__vibe_kanban__update_task tool with project_id: "{{projectId}}" and task_id: "{{taskId}}" to set status to 'done'
+Use the mcp__vibe_kanban__update_task tool with project_id: "{{PROJECT_ID}}" and task_id: "{{TASK_ID}}" to set status to 'done'
 
 ### If NOT MERGING:
 \`\`\`
