@@ -252,45 +252,47 @@ export const AutomationSettings: React.FC<AutomationSettingsProps> = ({
                 </div>
             </div>
 
-            {/* Base Branch Selection */}
-            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                <div className="flex items-start">
-                    <GitBranch className="w-5 h-5 text-orange-600 dark:text-orange-400 mr-3 mt-1" />
-                    <div className="flex-1">
-                        <h3 className="font-medium text-gray-900 dark:text-white mb-2">
-                            Base Branch for Tasks
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
-                            Select the branch to use as base when starting new tasks
-                        </p>
-                        
-                        {branchesLoading ? (
-                            <div className="text-sm text-gray-500">Loading branches...</div>
-                        ) : branchData ? (
-                            <div className="space-y-2">
-                                <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                                    Project: {branchData.projectName}
+            {/* Base Branch Selection - Only visible when automatic task picking is enabled */}
+            {!!settings.automaticTaskPicking && (
+                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 ml-8 border-l-4 border-purple-500">
+                    <div className="flex items-start">
+                        <GitBranch className="w-5 h-5 text-orange-600 dark:text-orange-400 mr-3 mt-1" />
+                        <div className="flex-1">
+                            <h3 className="font-medium text-gray-900 dark:text-white mb-2">
+                                Base Branch for Tasks
+                            </h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                                Select the branch to use as base when starting new tasks
+                            </p>
+                            
+                            {branchesLoading ? (
+                                <div className="text-sm text-gray-500">Loading branches...</div>
+                            ) : branchData ? (
+                                <div className="space-y-2">
+                                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                                        Project: {branchData.projectName}
+                                    </div>
+                                    <select
+                                        value={settings.baseBranch}
+                                        onChange={onBranchSelectChange}
+                                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    >
+                                        {branchData.branches.map((branch: BranchInfo) => (
+                                            <option key={branch.name} value={branch.name}>
+                                                {branch.name} {branch.is_current ? ' (current)' : ''}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
-                                <select
-                                    value={settings.baseBranch}
-                                    onChange={onBranchSelectChange}
-                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                >
-                                    {branchData.branches.map((branch: BranchInfo) => (
-                                        <option key={branch.name} value={branch.name}>
-                                            {branch.name} {branch.is_current ? ' (current)' : ''}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        ) : (
-                            <div className="text-sm text-red-600 dark:text-red-400">
-                                Failed to load branches. Check if Vibe Kanban is running.
-                            </div>
-                        )}
+                            ) : (
+                                <div className="text-sm text-red-600 dark:text-red-400">
+                                    Failed to load branches. Check if Vibe Kanban is running.
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
 
             {/* Status */}
             <div className="mt-6">
