@@ -50,7 +50,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
     NODE_VERSION=20 \
     CLAUDE_CODE_ENABLE_TELEMETRY=0 \
     HOME=/home/developer \
-    NODE_ENV=production
+    NODE_ENV=production \
+    VIBE_KANBAN_URL=""
 
 # Install production runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \

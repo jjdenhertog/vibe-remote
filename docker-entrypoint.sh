@@ -11,8 +11,14 @@ USERNAME=${USERNAME:-developer}
 USER_ID=${USER_ID:-1000}
 GROUP_ID=${GROUP_ID:-1000}
 
-# Export Vibe Kanban URL for the web interface
-export NEXT_PUBLIC_VIBE_KANBAN_URL=${NEXT_PUBLIC_VIBE_KANBAN_URL:-http://localhost:9091}
+# Export Vibe Kanban URL for the web interface (only if provided)
+if [ -n "${VIBE_KANBAN_URL}" ]; then
+    echo "✅ VIBE_KANBAN_URL configured: ${VIBE_KANBAN_URL}"
+    export VIBE_KANBAN_URL="${VIBE_KANBAN_URL}"
+    # Make it available globally for SSH sessions and other processes
+    echo "export VIBE_KANBAN_URL=\"${VIBE_KANBAN_URL}\"" >> /etc/environment
+    echo "VIBE_KANBAN_URL=\"${VIBE_KANBAN_URL}\"" >> /etc/environment
+fi
 
 # Update user ID and group ID if they differ from build args
 CURRENT_UID=$(id -u ${USERNAME} 2>/dev/null || echo "")

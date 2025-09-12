@@ -1,10 +1,13 @@
-"use client";
-
 import { AlertCircle } from "lucide-react";
+import { unstable_noStore as noStore } from 'next/cache';
+import VibeKanbanClient from './client';
 
-export default function VibeKanbanPage() {
-    // NEXT_PUBLIC_ variables are exposed to the browser automatically
-    const vibeKanbanUrl = process.env.NEXT_PUBLIC_VIBE_KANBAN_URL;
+export default async function VibeKanbanPage() {
+    // Force dynamic rendering to read runtime environment variables
+    noStore();
+    
+    // Access environment variable on the server at runtime
+    const vibeKanbanUrl = process.env.VIBE_KANBAN_URL;
     
     if (!vibeKanbanUrl) {
         return (
@@ -15,7 +18,7 @@ export default function VibeKanbanPage() {
                         Vibe Kanban Not Configured
                     </h2>
                     <p className="text-gray-600 dark:text-gray-400 mb-4">
-                        The NEXT_PUBLIC_VIBE_KANBAN_URL environment variable is not configured.
+                        The VIBE_KANBAN_URL environment variable is not configured.
                     </p>
                     <p className="text-sm text-gray-500 dark:text-gray-500">
                         Please set the environment variable and restart the application.
@@ -25,16 +28,6 @@ export default function VibeKanbanPage() {
         );
     }
     
-    return (
-        <div className="h-[calc(100vh-4rem)] w-full overflow-hidden">
-            {/* eslint-disable-next-line react/iframe-missing-sandbox */}
-            <iframe
-                src={vibeKanbanUrl}
-                className="w-full h-full border-0"
-                title="Vibe Kanban"
-                sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals"
-                allow="clipboard-write"
-            />
-        </div>
-    );
+    // Pass the URL to the client component for iframe rendering
+    return <VibeKanbanClient vibeKanbanUrl={vibeKanbanUrl} />;
 }

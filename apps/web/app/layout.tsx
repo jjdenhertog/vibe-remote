@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import TopNavigation from "@/components/navigation/TopNavigation";
+import ConditionalLayout from "@/components/layout/ConditionalLayout";
 import "./globals.css";
 
 // Fallback fonts when Google Fonts are not available
@@ -12,7 +12,7 @@ const geistMono = {
 };
 
 export const metadata: Metadata = {
-    title: "Vibe Remote Workstation",
+    title: "Vibe 🤮 Remote 🚀",
     description: "AI-powered development environment with intelligent context and automations",
 };
 
@@ -26,10 +26,9 @@ export default function RootLayout({
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-                <TopNavigation />
-                <main className="min-h-[calc(100vh-4rem)]">
+                <ConditionalLayout>
                     {children}
-                </main>
+                </ConditionalLayout>
             </body>
         </html>
     );

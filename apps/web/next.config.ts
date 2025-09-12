@@ -13,10 +13,6 @@ const nextConfig: NextConfig = {
         outputFileTracingRoot: path.join(__dirname, '../../'),
     }),
     
-    // Pass through environment variables to the client
-    env: {
-        NEXT_PUBLIC_VIBE_KANBAN_URL: process.env.NEXT_PUBLIC_VIBE_KANBAN_URL || 'http://localhost:9091',
-    },
     
     // Monaco Editor configuration
     webpack: (config, { isServer }) => {

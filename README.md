@@ -83,7 +83,7 @@ services:
       # CHANGE THESE: Use unique ports for each project
       - "9090:9090"       # SSH
       - "9091:9091"       # Vibe-Kanban
-      - "9092:8080"       # Vibe-Remote Web App
+      - "9092:8080"       # Vibe 🤮 Remote 🚀 Web App
       
     volumes:
       # Persistent storage split into three volumes
@@ -125,7 +125,7 @@ services:
     ports:
       - "9090:9090"     # SSH
       - "9091:9091"     # Vibe-Kanban
-      - "9092:8080"     # Vibe-Remote Web App
+      - "9092:8080"     # Vibe 🤮 Remote 🚀 Web App
     
     volumes:
       - credentials:/workspace/credentials
@@ -142,7 +142,7 @@ volumes:
 
 - SSH: `ssh developer@localhost -p 9090`
 - Vibe-Kanban: `http://localhost:9091`  
-- Vibe-Remote Web App: `http://localhost:9092`
+- Vibe 🤮 Remote 🚀 Web App: `http://localhost:9092`
 
 ### First Time Setup
 
@@ -167,25 +167,6 @@ gh repo clone user/repo .
 # 5. Configure AI context and automations
 # Visit http://localhost:9092 to set up project goals and coding standards
 ```
-
-<<<<<<< HEAD
-=======
-## 💡 Working with AI Tools
-
-### Vibe-Kanban
-- Access the UI at port `9091` or the configured port
-- Create tasks and let AI agents work on them
-- See [documentation](https://www.vibekanban.com/docs) for advanced features
-
-### Web Configuration Interface
-- Visit `http://localhost:9092` to access the unified web interface
-- **Top Navigation Bar** for easy switching between:
-  - **AI Context**: Configure project goals and coding standards
-  - **Automations**: Set up PR creation and code review workflows
-  - **Vibe Kanban**: Embedded task management interface
-- All settings persist across container restarts
-- Integrated Vibe Kanban view - no need to switch browser tabs
->>>>>>> 63f7bc74e2465704f97ecf6270c07178b793e086
 
 ## 🔒 Enhanced Security with Firewall
 
