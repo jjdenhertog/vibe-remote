@@ -1,16 +1,38 @@
 import { spawn } from 'node:child_process';
 
+function parseProgressMessage(chunk: string): void {
+    const lines = chunk.split('\n').filter((line: string) => line.trim());
+
+    for (const line of lines) {
+        try {
+            const json = JSON.parse(line);
+
+            if (json.type === 'assistant' && json.message?.content?.[0]?.text) {
+                const [content] = json.message.content;
+                const { text } = content;
+
+                if (text.length < 100) {
+                    // eslint-disable-next-line no-console
+                    console.log(`🤖 ${text}`);
+                }
+            }
+        } catch {
+            // Ignore invalid JSON
+        }
+    }
+}
 
 type RunClaudeCommandOptions = {
     promptFile: string;
     additionalArgs?: string[];
     verbose?: boolean;
     streamOutput?: boolean;
+    showProgress?: boolean;
 };
 
 export function runClaudeCommand(options: RunClaudeCommandOptions): Promise<void> {
 
-    const { promptFile, additionalArgs = [], verbose = true, streamOutput = true } = options;
+    const { promptFile, additionalArgs = [], verbose = true, streamOutput = true, showProgress = false } = options;
 
     return new Promise((resolve, reject) => {
         const baseArgs = [
@@ -32,10 +54,28 @@ export function runClaudeCommand(options: RunClaudeCommandOptions): Promise<void
             return !baseArgKeys.has(arg) && !baseArgKeys.has(argKey ?? '');
         });
 
-        const claude = spawn('claude', [...baseArgs, ...filteredAdditionalArgs], { stdio: ['inherit', 'pipe', 'pipe'] });
+        const finalArgs = [...baseArgs, ...filteredAdditionalArgs];
+        
+        // Use 'ignore' for stdin to prevent hanging in bash scripts, 'pipe' for stdout/stderr
+        const claude = spawn('claude', finalArgs, { 
+            stdio: ['ignore', 'pipe', 'pipe'],
+            detached: false 
+        });
 
-        claude.stdout.on('data', (data) => { process.stdout.write(data); });
-        claude.stderr.on('data', (data) => { process.stderr.write(data); });
+        claude.stdout.on('data', (data) => {
+            const chunk = data.toString();
+
+            if (showProgress) {
+                parseProgressMessage(chunk);
+            } else {
+                process.stdout.write(data);
+            }
+        });
+
+        claude.stderr.on('data', (data) => {
+            process.stderr.write(data);
+        });
+
 
         claude.on('close', (code) => {
             if (code === 0) {
@@ -48,5 +88,6 @@ export function runClaudeCommand(options: RunClaudeCommandOptions): Promise<void
         claude.on('error', (error) => {
             reject(error);
         });
+
     });
 }

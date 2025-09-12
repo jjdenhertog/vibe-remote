@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { ToggleLeft, ToggleRight, CheckCircle2, GitPullRequest, Settings, GitBranch, GitMerge } from 'lucide-react';
+import { Editor } from '@monaco-editor/react';
 import type { BranchInfo, ProjectBranchesResponse } from '@vibe-remote/vibe-kanban-api/types/api';
 import { AutomationStatusSummary } from './AutomationStatusSummary';
 
@@ -18,24 +19,32 @@ type AutomationSettingsProps = {
     readonly settings: AutomationSettings;
     readonly branchData: ProjectBranchesResponse | null;
     readonly branchesLoading: boolean;
+    readonly reviewPrompt: string;
+    readonly automergePrompt: string;
     readonly onAutoPRToggle: () => void;
     readonly onCodeReviewToggle: () => void;
     readonly onTaskPickingToggle: () => void;
     readonly onBranchSelectChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
     readonly onAutoMergeToggle: () => void;
     readonly onMergeDecisionModeChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    readonly onReviewPromptChange: (value: string | undefined) => void;
+    readonly onAutomergePromptChange: (value: string | undefined) => void;
 };
 
 export const AutomationSettings: React.FC<AutomationSettingsProps> = ({
     settings,
     branchData,
     branchesLoading,
+    reviewPrompt,
+    automergePrompt,
     onAutoPRToggle,
     onCodeReviewToggle,
     onTaskPickingToggle,
     onBranchSelectChange,
     onAutoMergeToggle,
-    onMergeDecisionModeChange
+    onMergeDecisionModeChange,
+    onReviewPromptChange,
+    onAutomergePromptChange
 }) => {
     return (
         <div className="space-y-6">
@@ -125,9 +134,29 @@ export const AutomationSettings: React.FC<AutomationSettingsProps> = ({
                             {/* Info message for Claude Decision mode */}
                             {settings.mergeDecisionMode === 'claude-decision' && (
                                 <div className="mt-3">
-                                    <p className="text-xs text-purple-600 dark:text-purple-400">
+                                    <p className="text-xs text-purple-600 dark:text-purple-400 mb-3">
                                         Claude will review and decide whether to merge the PR
                                     </p>
+                                    <div className="border border-gray-300 dark:border-gray-600 rounded-md overflow-hidden">
+                                        <div className="bg-gray-100 dark:bg-gray-800 px-3 py-2 border-b border-gray-300 dark:border-gray-600">
+                                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Auto-merge Prompt</span>
+                                        </div>
+                                        <div className="h-[200px] min-h-[100px] max-h-[600px] resize-y overflow-auto">
+                                            <Editor
+                                                value={automergePrompt}
+                                                language="markdown"
+                                                theme="vs-dark"
+                                                onChange={onAutomergePromptChange}
+                                                options={{
+                                                    fontSize: 12,
+                                                    wordWrap: 'on',
+                                                    minimap: { enabled: false },
+                                                    scrollBeyondLastLine: false,
+                                                    automaticLayout: true,
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -165,6 +194,30 @@ export const AutomationSettings: React.FC<AutomationSettingsProps> = ({
                         )}
                     </button>
                 </div>
+                
+                {/* Inline Review Prompt Editor */}
+                {settings.doCodeReviewBeforeFinishing ? <div className="mt-4 pl-8">
+                    <div className="border border-gray-300 dark:border-gray-600 rounded-md overflow-hidden">
+                        <div className="bg-gray-100 dark:bg-gray-800 px-3 py-2 border-b border-gray-300 dark:border-gray-600">
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Review Prompt</span>
+                        </div>
+                        <div className="h-[200px] min-h-[100px] max-h-[600px] resize-y overflow-auto">
+                            <Editor
+                                value={reviewPrompt}
+                                language="markdown"
+                                theme="vs-dark"
+                                onChange={onReviewPromptChange}
+                                options={{
+                                    fontSize: 12,
+                                    wordWrap: 'on',
+                                    minimap: { enabled: false },
+                                    scrollBeyondLastLine: false,
+                                    automaticLayout: true,
+                                }}
+                                />
+                        </div>
+                    </div>
+                </div> : null}
             </div>
 
             {/* Automatic Task Picking */}
@@ -198,7 +251,6 @@ export const AutomationSettings: React.FC<AutomationSettingsProps> = ({
                     </button>
                 </div>
             </div>
-
             {/* Base Branch Selection - Only show when automatic task picking is enabled */}
             {!!settings.automaticTaskPicking && (
                 <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 ml-8 border-l-4 border-purple-500">

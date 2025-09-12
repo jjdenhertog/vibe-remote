@@ -29,7 +29,7 @@ SCORE: [X]/10
 DECISION: MERGE
 REASON: [brief why]
 
-gh pr merge {{PR_URL}} --squash --body "Auto-merged: [X]/10" --delete-branch
+gh pr merge --merge --body "Auto-merged: [X]/10" --delete-branch
 \`\`\`
 
 ### If NOT MERGING:

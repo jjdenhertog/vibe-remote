@@ -28,8 +28,9 @@ async function main(): Promise<void> {
             process.exit(1);
         }
 
+        const automationPreferences = readAutomationPreferences();
+
         const preferenceContext = readPreferenceFiles();
-        const enhancedPrompt = prependContextToPrompt(prompt, preferenceContext);
         const currentDir = dirname(new URL(import.meta.url).pathname);
         const templatesDir = join(currentDir, 'claude-wrapper-dist', 'templates');
 
@@ -46,12 +47,14 @@ async function main(): Promise<void> {
 
             const templatePath = join(templatesDir, 'claude-flow-prompt.md');
             const templateContent = readFileSync(templatePath, 'utf8');
-            const finalContent = templateContent.replace(/%REPLACE_WITH_PROMPT%/g, enhancedPrompt);
-            writeFileSync(promptFile, finalContent);
+            const finalContent = templateContent.replace(/%REPLACE_WITH_PROMPT%/g, prompt);
+
+            const enhancedPrompt = prependContextToPrompt(finalContent, preferenceContext);
+            writeFileSync(promptFile, enhancedPrompt);
 
             await runClaudeCommand({promptFile, additionalArgs});
 
-            const automationPreferences = readAutomationPreferences();
+            
             if (automationPreferences.doCodeReviewBeforeFinishing)
                 await executeCodeReview(prompt, additionalArgs);
 
@@ -59,17 +62,23 @@ async function main(): Promise<void> {
         } else if (usePlan) {
             const templatePath = join(templatesDir, 'claude-plan-prompt.md');
             const templateContent = readFileSync(templatePath, 'utf8');
-            const finalContent = templateContent.replace(/%REPLACE_WITH_PROMPT%/g, enhancedPrompt);
-            writeFileSync(promptFile, finalContent);
+            const finalContent = templateContent.replace(/%REPLACE_WITH_PROMPT%/g, prompt);
+
+            const enhancedPrompt = prependContextToPrompt(finalContent, preferenceContext);
+            writeFileSync(promptFile, enhancedPrompt);
 
             await runClaudeCommand({promptFile, additionalArgs});
         } else {
             const templatePath = join(templatesDir, 'claude-prompt.md');
             const templateContent = readFileSync(templatePath, 'utf8');
-            const finalContent = templateContent.replace(/%REPLACE_WITH_PROMPT%/g, enhancedPrompt);
-            writeFileSync(promptFile, finalContent);
+            const finalContent = templateContent.replace(/%REPLACE_WITH_PROMPT%/g, prompt);
+            const enhancedPrompt = prependContextToPrompt(finalContent, preferenceContext);
+            writeFileSync(promptFile, enhancedPrompt);
 
             await runClaudeCommand({promptFile, additionalArgs});
+
+            if (automationPreferences.doCodeReviewBeforeFinishing)
+                await executeCodeReview(prompt, additionalArgs);
         }
 
     } catch (error) {

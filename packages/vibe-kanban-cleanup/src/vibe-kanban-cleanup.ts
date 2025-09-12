@@ -2,10 +2,10 @@
 
 import { readAutomationPreferences } from "@vibe-remote/shared-utils/readAutomationPreferences";
 import { fetchVibeKanbanContext, VibeKanbanContext } from "@vibe-remote/vibe-kanban-api/utils/fetchVibeKanbanContext";
-import { createPullRequest } from "./functions/createPullRequest";
 import { AutomationPreferences } from "@vibe-remote/shared-utils/readAutomationPreferences";
 import { execSync } from "node:child_process";
 import { runAutoMerge } from "./claude/runAutoMerge";
+import { createPullRequest } from "./functions/createPullRequest";
 
 class VibeKanbanCleanup {
     // private readonly prBodyFile = 'pr_body.md';
@@ -25,6 +25,8 @@ class VibeKanbanCleanup {
             const preferences = readAutomationPreferences();
 
             if (preferences.automaticallyCreatePR) {
+                // Check if GitHub CLI is available and use it, otherwise fall back to API
+
                 const prUrl = await createPullRequest(context);
                 console.log(`\n✅ PR created: ${prUrl}`);
 
@@ -51,7 +53,7 @@ class VibeKanbanCleanup {
             console.log('\n🔀 Auto-merge mode is "always" - attempting to merge PR...');
 
             try {
-                const mergeCommand = `gh pr merge --squash --body "Auto-merged by vibe-kanban" --delete-branch`;
+                const mergeCommand = `gh pr merge --merge --body "Auto-merged by vibe-kanban" --delete-branch`;
                 execSync(mergeCommand);
             } catch (_error) {
             }

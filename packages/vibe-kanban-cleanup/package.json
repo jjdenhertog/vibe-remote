@@ -33,6 +33,7 @@
     "typescript"
   ],
   "dependencies": {
+    "@vibe-remote/github": "workspace:*",
     "@vibe-remote/shared-utils": "workspace:*",
     "@vibe-remote/vibe-kanban-api": "workspace:*"
   },

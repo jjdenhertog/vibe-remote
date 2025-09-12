@@ -38,7 +38,7 @@ export default defineConfig({
   external: [],
   
   // Ensure workspace dependencies are bundled
-  noExternal: ['@vibe-remote/vibe-kanban-api', '@vibe-remote/shared-utils'],
+  noExternal: ['@vibe-remote/vibe-kanban-api', '@vibe-remote/shared-utils', '@vibe-remote/github'],
   
   // Ensure proper file extensions for ESM
   outExtension({ format }) {

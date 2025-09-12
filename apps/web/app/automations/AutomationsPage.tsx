@@ -2,12 +2,11 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { enqueueSnackbar } from 'notistack';
-import { Save, ArrowLeft, Code, FileText } from 'lucide-react';
+import { Save, ArrowLeft, Code } from 'lucide-react';
 import Link from 'next/link';
 import type { ProjectBranchesResponse } from '@vibe-remote/vibe-kanban-api/types/api';
 import { AutomationSettings } from './components/AutomationSettings';
 import { JsonEditor } from './components/JsonEditor';
-import { Editor } from '@monaco-editor/react';
 
 type AutomationSettings = {
     automaticallyCreatePR: boolean;
@@ -36,9 +35,7 @@ export const AutomationsPage = () => {
     const [jsonError, setJsonError] = useState<string | null>(null);
     const [branchData, setBranchData] = useState<ProjectBranchesResponse | null>(null);
     const [branchesLoading, setBranchesLoading] = useState(false);
-    const [showPromptEditor, setShowPromptEditor] = useState(false);
     const [showJsonEditor, setShowJsonEditor] = useState(false);
-    const [activePromptTab, setActivePromptTab] = useState<'review' | 'automerge'>('review');
 
     const loadSettings = useCallback(async () => {
         try {
@@ -206,21 +203,12 @@ export const AutomationsPage = () => {
         setSettings(newSettings);
         setJsonValue(JSON.stringify(newSettings, null, 2));
         setJsonError(null);
-        // Keep the current prompt editor state when changing modes
-        if (mode !== 'claude-decision') {
-            setShowPromptEditor(false);
-        }
+        // Keep the current JSON editor state when changing modes
     }, [settings]);
 
 
-    const handlePromptEditorToggle = useCallback(() => {
-        setShowPromptEditor(!showPromptEditor);
-        setShowJsonEditor(false);
-    }, [showPromptEditor]);
-
     const handleJsonEditorToggle = useCallback(() => {
         setShowJsonEditor(!showJsonEditor);
-        setShowPromptEditor(false);
     }, [showJsonEditor]);
 
     const handleReviewPromptChange = useCallback((value: string | undefined) => {
@@ -231,13 +219,6 @@ export const AutomationsPage = () => {
         setAutomergePrompt(value || '');
     }, []);
 
-    const handleReviewTabClick = useCallback(() => {
-        setActivePromptTab('review');
-    }, []);
-
-    const handleAutomergeTabClick = useCallback(() => {
-        setActivePromptTab('automerge');
-    }, []);
 
     const handleSaveClick = useCallback(() => {
         handleSave().catch(console.error);
@@ -273,14 +254,6 @@ export const AutomationsPage = () => {
                             <div className="flex items-center gap-3">
                                 <button
                                     type="button"
-                                    onClick={handlePromptEditorToggle}
-                                    className="inline-flex items-center gap-2 px-3 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                                >
-                                    <FileText className="w-4 h-4" />
-                                    {showPromptEditor ? 'Hide Prompts' : 'Edit Prompts'}
-                                </button>
-                                <button
-                                    type="button"
                                     onClick={handleJsonEditorToggle}
                                     className="inline-flex items-center gap-2 px-3 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                                 >
@@ -301,74 +274,7 @@ export const AutomationsPage = () => {
                     </div>
 
                     <div className="p-6">
-                        {showPromptEditor ? (
-                            /* Prompt Editors */
-                            <>
-                                {/* Tabs */}
-                                <div className="border-b border-gray-200 dark:border-gray-700">
-                                    <nav className="flex space-x-8 mb-4">
-                                        <button
-                                            type="button"
-                                            onClick={handleReviewTabClick}
-                                            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                                                activePromptTab === 'review'
-                                                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                                                    : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
-                                            }`}
-                                        >
-                                            <FileText className="w-4 h-4 inline-block mr-2" />
-                                            Review Prompt
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={handleAutomergeTabClick}
-                                            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                                                activePromptTab === 'automerge'
-                                                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                                                    : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
-                                            }`}
-                                        >
-                                            <FileText className="w-4 h-4 inline-block mr-2" />
-                                            Auto-merge Prompt
-                                        </button>
-                                    </nav>
-                                </div>
-                                
-                                {/* Editor */}
-                                <div className="h-[500px] mt-4">
-                                    {activePromptTab === 'review' && (
-                                        <Editor
-                                            value={reviewPrompt}
-                                            language="markdown"
-                                            theme="vs-dark"
-                                            onChange={handleReviewPromptChange}
-                                            options={{
-                                                fontSize: 14,
-                                                wordWrap: 'on',
-                                                minimap: { enabled: false },
-                                                scrollBeyondLastLine: false,
-                                                automaticLayout: true,
-                                            }}
-                                        />
-                                    )}
-                                    {activePromptTab === 'automerge' && (
-                                        <Editor
-                                            value={automergePrompt}
-                                            language="markdown"
-                                            theme="vs-dark"
-                                            onChange={handleAutomergePromptChange}
-                                            options={{
-                                                fontSize: 14,
-                                                wordWrap: 'on',
-                                                minimap: { enabled: false },
-                                                scrollBeyondLastLine: false,
-                                                automaticLayout: true,
-                                            }}
-                                        />
-                                    )}
-                                </div>
-                            </>
-                        ) : showJsonEditor ? (
+                        {showJsonEditor ? (
                             /* JSON Editor */
                             <JsonEditor
                                 jsonValue={jsonValue}
@@ -381,12 +287,16 @@ export const AutomationsPage = () => {
                                 settings={settings}
                                 branchData={branchData}
                                 branchesLoading={branchesLoading}
+                                reviewPrompt={reviewPrompt}
+                                automergePrompt={automergePrompt}
                                 onAutoPRToggle={handleAutoPRToggle}
                                 onCodeReviewToggle={handleCodeReviewToggle}
                                 onTaskPickingToggle={handleTaskPickingToggle}
                                 onBranchSelectChange={handleBranchSelectChange}
                                 onAutoMergeToggle={handleAutoMergeToggle}
                                 onMergeDecisionModeChange={handleMergeDecisionModeChange}
+                                onReviewPromptChange={handleReviewPromptChange}
+                                onAutomergePromptChange={handleAutomergePromptChange}
                             />
                         )}
                     </div>

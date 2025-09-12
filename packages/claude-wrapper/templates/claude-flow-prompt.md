@@ -9,7 +9,7 @@ You are orchestrating a Claude Flow Swarm using Claude Code's Task tool for agen
 🎯 OBJECTIVE: %REPLACE_WITH_PROMPT%
 
 #IMPORTANT
-- Always make sure the following is in the .gitignore: CLAUDE.md, .claude-flow, memory, claude-flow-prompt.*
+- Always make sure the following is in the .gitignore: CLAUDE.md, .claude-flow, memory, vibe-prompt-*
 
 🐝 SWARM CONFIGURATION:
 - Strategy: auto
