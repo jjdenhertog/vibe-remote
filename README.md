@@ -88,16 +88,11 @@ services:
       # - GIT_USERNAME=Your Name
       # - GIT_USEREMAIL=your@email.com
       
-      # Optional: GitHub Personal Access Token (fine-grained recommended)
+      # GitHub Personal Access Token (fine-grained recommended)
       # This automatically authenticates GitHub CLI - no need for manual gh auth login
       # Create at: https://github.com/settings/tokens?type=beta
-      # Required permissions for fine-grained tokens:
-      #   - Repository permissions: Read access to metadata, Read/Write access to code
-      #   - Account permissions: Read access to organizations (if working with org repos)
-      # Token format: ghp_xxxxxxxxxxxxxxxxxxxx
-      # - GITHUB_TOKEN=ghp_your_token_here
-      # or use GH_TOKEN (both work, GH_TOKEN takes precedence)
-      # - GH_TOKEN=ghp_your_token_here
+      # Required scopes: repo, read:org
+      - GITHUB_TOKEN=ghp_your_token_here
       
       # Optional: Match your host user/group ID for file permissions
       # - USER_ID=1000
@@ -149,11 +144,8 @@ services:
     
     environment:
       - DEVELOPER_PASSWORD=changeme
-      - GIT_USERNAME=Your Name
-      - GIT_USEREMAIL=your@email.com
+      - GITHUB_TOKEN=ghp_your_token_here
       - NEXT_PUBLIC_VIBE_KANBAN_URL=http://localhost:9091
-      # Optional: GitHub token for automatic authentication
-      # - GITHUB_TOKEN=ghp_your_token_here
     
     ports:
       - "9090:9090"     # SSH
@@ -191,7 +183,7 @@ claude login              # Claude Code auth
 gh auth login
 
 # Option B: Automatic with token (recommended)
-# Add GITHUB_TOKEN or GH_TOKEN to your docker-compose.yml environment
+# Add GITHUB_TOKEN to your docker-compose.yml environment
 # No manual authentication needed - token is configured automatically!
 
 # 3. Configure Git
@@ -203,9 +195,6 @@ cd /workspace/project
 git clone git@github.com:user/repo.git .
 # or
 gh repo clone user/repo .
-
-# 5. Configure AI context and automations
-# Visit http://localhost:9092 to set up project goals and coding standards
 ```
 
 ## 🔒 Enhanced Security with Firewall
@@ -222,36 +211,15 @@ You have two options for GitHub CLI authentication:
 
 Add a GitHub Personal Access Token to your docker-compose.yml:
 
-1. **Create a fine-grained personal access token:**
-   - Go to: https://github.com/settings/tokens?type=beta
-   - Click "Generate new token" → "Fine-grained personal access token"
-   - Set expiration (recommended: 90 days for security)
-   - Select repositories (specific repos or all repos)
-   
-2. **Configure required permissions:**
-   - **Repository permissions:**
-     - Contents: Read/Write (for cloning and pushing)
-     - Metadata: Read (always required)
-     - Pull requests: Read/Write (if working with PRs)
-     - Issues: Read/Write (if working with issues)
-   - **Account permissions:**
-     - Organizations: Read (if working with org repos)
-
-3. **Add to your docker-compose.yml:**
+1. Create a fine-grained personal access token at: https://github.com/settings/tokens?type=beta
+2. Required scopes: `repo`, `read:org`
+3. Add to your docker-compose.yml environment:
    ```yaml
    environment:
-     # Either GITHUB_TOKEN or GH_TOKEN work
-     # GH_TOKEN takes precedence if both are set
      - GITHUB_TOKEN=ghp_your_token_here
-     # or
-     - GH_TOKEN=ghp_your_token_here
    ```
-
-4. **Benefits:**
-   - Token is automatically configured when container starts
-   - No manual `gh auth login` needed
-   - Works immediately with all gh CLI commands
-   - Token is validated during container startup
+4. The token will be automatically configured when the container starts
+5. No manual `gh auth login` needed!
 
 ### Option 2: Manual Authentication
 

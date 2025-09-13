@@ -83,30 +83,23 @@ if [ -n "$GIT_USEREMAIL" ]; then
 fi
 
 # Auto-configure GitHub CLI authentication if token is provided
-if [ -n "$GITHUB_TOKEN" ] || [ -n "$GH_TOKEN" ]; then
+if [ -n "$GITHUB_TOKEN" ]; then
     echo "🔧 Configuring GitHub CLI authentication..."
     
-    # Use GH_TOKEN if GITHUB_TOKEN is not set
-    if [ -z "$GH_TOKEN" ] && [ -n "$GITHUB_TOKEN" ]; then
-        export GH_TOKEN="$GITHUB_TOKEN"
-    fi
+    # GitHub CLI uses GH_TOKEN internally, so we export it
+    export GH_TOKEN="$GITHUB_TOKEN"
     
     # Make it available globally for SSH sessions and other processes
-    echo "export GH_TOKEN=\"${GH_TOKEN}\"" >> /etc/environment
+    echo "export GH_TOKEN=\"${GITHUB_TOKEN}\"" >> /etc/environment
     
     # Also make it available for the developer user
-    echo "export GH_TOKEN=\"${GH_TOKEN}\"" >> /home/${USERNAME}/.bashrc
+    echo "export GH_TOKEN=\"${GITHUB_TOKEN}\"" >> /home/${USERNAME}/.bashrc
     
     # Disable interactive prompts for non-interactive use
     echo "export GH_PROMPT_DISABLED=1" >> /etc/environment
     echo "export GH_PROMPT_DISABLED=1" >> /home/${USERNAME}/.bashrc
     
-    # Verify the token works by checking auth status
-    if su - ${USERNAME} -c "GH_TOKEN=\"${GH_TOKEN}\" gh auth status" &>/dev/null; then
-        echo "✅ GitHub CLI authentication configured and verified with token"
-    else
-        echo "⚠️  GitHub CLI token configured but verification failed. Token may be invalid or expired."
-    fi
+    echo "✅ GitHub CLI authentication configured with token"
 fi
 
 # Set up persistent credential storage (must be done early)
@@ -137,7 +130,7 @@ cat > /etc/motd << 'EOF'
 
 Quick Start:
   1. claude login         # Authenticate (one-time, persists!)
-  2. gh auth login        # GitHub authentication (or use GITHUB_TOKEN/GH_TOKEN env var)
+  2. gh auth login        # GitHub authentication (or use GITHUB_TOKEN env var)
   3. git config --global user.name "Your Name"  # Or set GIT_USERNAME env var
   4. git config --global user.email "your@email.com"  # Or set GIT_USEREMAIL env var
   5. cd /workspace/project && gh repo clone user/repo .
