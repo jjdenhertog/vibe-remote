@@ -85,21 +85,21 @@ fi
 # Auto-configure GitHub CLI authentication if token is provided
 if [ -n "$GITHUB_TOKEN" ]; then
     echo "🔧 Configuring GitHub CLI authentication..."
-    
-    # GitHub CLI uses GH_TOKEN internally, so we export it
+
+    # GitHub CLI prefers GH_TOKEN, so we set it from GITHUB_TOKEN
     export GH_TOKEN="$GITHUB_TOKEN"
-    
-    # Make it available globally for SSH sessions and other processes
+
+    # Make GH_TOKEN available globally for SSH sessions and other processes
     echo "export GH_TOKEN=\"${GITHUB_TOKEN}\"" >> /etc/environment
-    
+
     # Also make it available for the developer user
     echo "export GH_TOKEN=\"${GITHUB_TOKEN}\"" >> /home/${USERNAME}/.bashrc
-    
+
     # Disable interactive prompts for non-interactive use
     echo "export GH_PROMPT_DISABLED=1" >> /etc/environment
     echo "export GH_PROMPT_DISABLED=1" >> /home/${USERNAME}/.bashrc
-    
-    echo "✅ GitHub CLI authentication configured with token"
+
+    echo "✅ GitHub CLI will use GH_TOKEN environment variable"
 fi
 
 # Set up persistent credential storage (must be done early)
@@ -134,7 +134,6 @@ Quick Start:
   3. git config --global user.name "Your Name"  # Or set GIT_USERNAME env var
   4. git config --global user.email "your@email.com"  # Or set GIT_USEREMAIL env var
   5. cd /workspace/project && gh repo clone user/repo .
-  6. cd /workspace/project && init-project  # Initialize AI tools
 
 EOF
 

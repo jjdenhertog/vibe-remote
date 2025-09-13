@@ -89,9 +89,6 @@ services:
       # - GIT_USEREMAIL=your@email.com
       
       # GitHub Personal Access Token (fine-grained recommended)
-      # This automatically authenticates GitHub CLI - no need for manual gh auth login
-      # Create at: https://github.com/settings/tokens?type=beta
-      # Required scopes: repo, read:org
       - GITHUB_TOKEN=ghp_your_token_here
       
       # Optional: Match your host user/group ID for file permissions
@@ -229,14 +226,6 @@ gh auth login
 ```
 
 Follow the interactive prompts to authenticate with your GitHub account.
-
-### Security Best Practices
-
-- **Never commit tokens:** Keep your docker-compose.yml with tokens in `.gitignore`
-- **Use environment files:** Store sensitive tokens in `.env` files (not tracked in git)
-- **Rotate tokens regularly:** Set expiration dates and rotate tokens periodically
-- **Use minimal permissions:** Only grant the permissions your project actually needs
-- **Fine-grained tokens preferred:** Use fine-grained tokens instead of classic tokens for better security
 
 ## 🖥️ VS Code / Cursor Remote Development
 

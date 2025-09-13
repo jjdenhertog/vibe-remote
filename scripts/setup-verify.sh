@@ -22,8 +22,9 @@ if [ ! -f "/workspace/credentials/claude.json" ] || [ ! -s "/workspace/credentia
 fi
 
 # Check GitHub CLI authentication
-if [ ! -f "/workspace/credentials/gh/hosts.yml" ]; then
-    WARNINGS="${WARNINGS}⚠️  GitHub CLI not authenticated - run: gh auth login\n"
+# Either check for stored credentials OR token-based auth
+if [ ! -f "/workspace/credentials/gh/hosts.yml" ] && [ -z "$GH_TOKEN" ]; then
+    WARNINGS="${WARNINGS}⚠️  GitHub CLI not authenticated - run: gh auth login or set GITHUB_TOKEN env var\n"
     ISSUES_FOUND=1
 fi
 
