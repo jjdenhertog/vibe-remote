@@ -37,6 +37,26 @@ Three AI agents built on Claude are accessible within Vibe-Kanban:
 
 ## 🚀 Quick Start
 
+### Setup Configuration (Recommended for GitHub Token)
+
+For secure token management, use the provided example files:
+
+1. **Copy example files:**
+   ```bash
+   cp .env.example .env
+   cp docker-compose.example.yml docker-compose.yml
+   ```
+
+2. **Edit `.env` file:** Add your GitHub token and customize settings
+   ```bash
+   nano .env  # or use your preferred editor
+   ```
+
+3. **Start the container:**
+   ```bash
+   docker-compose up -d
+   ```
+
 ### Deploy with Docker Compose or Portainer
 
 Choose one of the configurations below. These can be used as:
@@ -67,6 +87,17 @@ services:
       # Optional: Auto-configure Git (saves manual setup)
       # - GIT_USERNAME=Your Name
       # - GIT_USEREMAIL=your@email.com
+      
+      # Optional: GitHub Personal Access Token (fine-grained recommended)
+      # This automatically authenticates GitHub CLI - no need for manual gh auth login
+      # Create at: https://github.com/settings/tokens?type=beta
+      # Required permissions for fine-grained tokens:
+      #   - Repository permissions: Read access to metadata, Read/Write access to code
+      #   - Account permissions: Read access to organizations (if working with org repos)
+      # Token format: ghp_xxxxxxxxxxxxxxxxxxxx
+      # - GITHUB_TOKEN=ghp_your_token_here
+      # or use GH_TOKEN (both work, GH_TOKEN takes precedence)
+      # - GH_TOKEN=ghp_your_token_here
       
       # Optional: Match your host user/group ID for file permissions
       # - USER_ID=1000
@@ -121,6 +152,8 @@ services:
       - GIT_USERNAME=Your Name
       - GIT_USEREMAIL=your@email.com
       - NEXT_PUBLIC_VIBE_KANBAN_URL=http://localhost:9091
+      # Optional: GitHub token for automatic authentication
+      # - GITHUB_TOKEN=ghp_your_token_here
     
     ports:
       - "9090:9090"     # SSH
@@ -152,7 +185,14 @@ ssh developer@localhost -p 9090
 
 # 2. Authenticate everything (one-time - persists!)
 claude login              # Claude Code auth
-gh auth login            # GitHub CLI auth
+
+# GitHub CLI authentication - choose one:
+# Option A: Manual authentication (interactive)
+gh auth login
+
+# Option B: Automatic with token (recommended)
+# Add GITHUB_TOKEN or GH_TOKEN to your docker-compose.yml environment
+# No manual authentication needed - token is configured automatically!
 
 # 3. Configure Git
 git config --global user.name "Your Name"
@@ -173,6 +213,62 @@ gh repo clone user/repo .
 The workstation runs Claude Code with enhanced AI capabilities in a containerized environment. For additional security, you can implement a firewall using a Squid proxy.
 
 This setup creates a whitelist-based network filter that only allows connections to approved domains, preventing potential unwanted network access. See [FIREWALL.md](FIREWALL.md) for detailed setup instructions.
+
+## 🔑 GitHub Authentication
+
+You have two options for GitHub CLI authentication:
+
+### Option 1: Automatic Token Authentication (Recommended)
+
+Add a GitHub Personal Access Token to your docker-compose.yml:
+
+1. **Create a fine-grained personal access token:**
+   - Go to: https://github.com/settings/tokens?type=beta
+   - Click "Generate new token" → "Fine-grained personal access token"
+   - Set expiration (recommended: 90 days for security)
+   - Select repositories (specific repos or all repos)
+   
+2. **Configure required permissions:**
+   - **Repository permissions:**
+     - Contents: Read/Write (for cloning and pushing)
+     - Metadata: Read (always required)
+     - Pull requests: Read/Write (if working with PRs)
+     - Issues: Read/Write (if working with issues)
+   - **Account permissions:**
+     - Organizations: Read (if working with org repos)
+
+3. **Add to your docker-compose.yml:**
+   ```yaml
+   environment:
+     # Either GITHUB_TOKEN or GH_TOKEN work
+     # GH_TOKEN takes precedence if both are set
+     - GITHUB_TOKEN=ghp_your_token_here
+     # or
+     - GH_TOKEN=ghp_your_token_here
+   ```
+
+4. **Benefits:**
+   - Token is automatically configured when container starts
+   - No manual `gh auth login` needed
+   - Works immediately with all gh CLI commands
+   - Token is validated during container startup
+
+### Option 2: Manual Authentication
+
+SSH into the container and run:
+```bash
+gh auth login
+```
+
+Follow the interactive prompts to authenticate with your GitHub account.
+
+### Security Best Practices
+
+- **Never commit tokens:** Keep your docker-compose.yml with tokens in `.gitignore`
+- **Use environment files:** Store sensitive tokens in `.env` files (not tracked in git)
+- **Rotate tokens regularly:** Set expiration dates and rotate tokens periodically
+- **Use minimal permissions:** Only grant the permissions your project actually needs
+- **Fine-grained tokens preferred:** Use fine-grained tokens instead of classic tokens for better security
 
 ## 🖥️ VS Code / Cursor Remote Development
 

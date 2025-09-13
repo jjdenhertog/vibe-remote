@@ -3,6 +3,13 @@
 .env.local
 .env.*
 
+# Docker compose files with secrets
+docker-compose.yml
+docker-compose.yaml
+# Keep example files
+!docker-compose.example.yml
+!.env.example
+
 # Dependencies
 node_modules/
 .pnp

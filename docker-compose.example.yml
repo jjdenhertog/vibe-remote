@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+  ai-dev:
+    image: jjdenhertog/viberemote:latest
+    container_name: vibe-remote-workstation
+    
+    # Using .env file for sensitive configuration (recommended)
+    env_file:
+      - .env
+    
+    # Or specify environment variables directly (not recommended for tokens)
+    environment:
+      - DEVELOPER_PASSWORD=${DEVELOPER_PASSWORD}
+      - PROJECT_NAME=${PROJECT_NAME}
+      - GIT_USERNAME=${GIT_USERNAME}
+      - GIT_USEREMAIL=${GIT_USEREMAIL}
+      - NEXT_PUBLIC_VIBE_KANBAN_URL=${NEXT_PUBLIC_VIBE_KANBAN_URL}
+      - TZ=${TZ}
+      
+      # GitHub Token - automatically authenticates gh CLI
+      # Use either GITHUB_TOKEN or GH_TOKEN (GH_TOKEN takes precedence)
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      # - GH_TOKEN=${GH_TOKEN}
+      
+      # Optional configurations
+      # - PUBLIC_KEY=${PUBLIC_KEY}
+      # - USER_ID=${USER_ID}
+      # - GROUP_ID=${GROUP_ID}
+      
+    ports:
+      # CHANGE THESE: Use unique ports for each project
+      - "9090:9090"       # SSH
+      - "9091:9091"       # Vibe-Kanban
+      - "9092:8080"       # Vibe 🤮 Remote 🚀 Web App
+      
+    volumes:
+      # Persistent storage split into three volumes
+      - vibe-credentials:/workspace/credentials
+      - vibe-project:/workspace/project
+      - vibe-data:/workspace/data
+      
+      # Optional: Docker socket for Docker-in-Docker
+      # Uncomment if you need Docker access from within container
+      # - /var/run/docker.sock:/var/run/docker.sock:ro
+      
+    restart: unless-stopped
+
+volumes:
+  vibe-credentials:
+    driver: local
+  vibe-project:
+    driver: local
+  vibe-data:
+    driver: local
