@@ -37,6 +37,26 @@ Three AI agents built on Claude are accessible within Vibe-Kanban:
 
 ## 🚀 Quick Start
 
+### Setup Configuration (Recommended for GitHub Token)
+
+For secure token management, use the provided example files:
+
+1. **Copy example files:**
+   ```bash
+   cp .env.example .env
+   cp docker-compose.example.yml docker-compose.yml
+   ```
+
+2. **Edit `.env` file:** Add your GitHub token and customize settings
+   ```bash
+   nano .env  # or use your preferred editor
+   ```
+
+3. **Start the container:**
+   ```bash
+   docker-compose up -d
+   ```
+
 ### Deploy with Docker Compose or Portainer
 
 Choose one of the configurations below. These can be used as:
@@ -67,6 +87,12 @@ services:
       # Optional: Auto-configure Git (saves manual setup)
       # - GIT_USERNAME=Your Name
       # - GIT_USEREMAIL=your@email.com
+      
+      # GitHub Personal Access Token (fine-grained recommended)
+      # This automatically authenticates GitHub CLI - no need for manual gh auth login
+      # Create at: https://github.com/settings/tokens?type=beta
+      # Required scopes: repo, read:org
+      - GITHUB_TOKEN=ghp_your_token_here
       
       # Optional: Match your host user/group ID for file permissions
       # - USER_ID=1000
@@ -118,8 +144,7 @@ services:
     
     environment:
       - DEVELOPER_PASSWORD=changeme
-      - GIT_USERNAME=Your Name
-      - GIT_USEREMAIL=your@email.com
+      - GITHUB_TOKEN=ghp_your_token_here
       - NEXT_PUBLIC_VIBE_KANBAN_URL=http://localhost:9091
     
     ports:
@@ -152,7 +177,14 @@ ssh developer@localhost -p 9090
 
 # 2. Authenticate everything (one-time - persists!)
 claude login              # Claude Code auth
-gh auth login            # GitHub CLI auth
+
+# GitHub CLI authentication - choose one:
+# Option A: Manual authentication (interactive)
+gh auth login
+
+# Option B: Automatic with token (recommended)
+# Add GITHUB_TOKEN to your docker-compose.yml environment
+# No manual authentication needed - token is configured automatically!
 
 # 3. Configure Git
 git config --global user.name "Your Name"
@@ -163,9 +195,6 @@ cd /workspace/project
 git clone git@github.com:user/repo.git .
 # or
 gh repo clone user/repo .
-
-# 5. Configure AI context and automations
-# Visit http://localhost:9092 to set up project goals and coding standards
 ```
 
 ## 🔒 Enhanced Security with Firewall
@@ -173,6 +202,41 @@ gh repo clone user/repo .
 The workstation runs Claude Code with enhanced AI capabilities in a containerized environment. For additional security, you can implement a firewall using a Squid proxy.
 
 This setup creates a whitelist-based network filter that only allows connections to approved domains, preventing potential unwanted network access. See [FIREWALL.md](FIREWALL.md) for detailed setup instructions.
+
+## 🔑 GitHub Authentication
+
+You have two options for GitHub CLI authentication:
+
+### Option 1: Automatic Token Authentication (Recommended)
+
+Add a GitHub Personal Access Token to your docker-compose.yml:
+
+1. Create a fine-grained personal access token at: https://github.com/settings/tokens?type=beta
+2. Required scopes: `repo`, `read:org`
+3. Add to your docker-compose.yml environment:
+   ```yaml
+   environment:
+     - GITHUB_TOKEN=ghp_your_token_here
+   ```
+4. The token will be automatically configured when the container starts
+5. No manual `gh auth login` needed!
+
+### Option 2: Manual Authentication
+
+SSH into the container and run:
+```bash
+gh auth login
+```
+
+Follow the interactive prompts to authenticate with your GitHub account.
+
+### Security Best Practices
+
+- **Never commit tokens:** Keep your docker-compose.yml with tokens in `.gitignore`
+- **Use environment files:** Store sensitive tokens in `.env` files (not tracked in git)
+- **Rotate tokens regularly:** Set expiration dates and rotate tokens periodically
+- **Use minimal permissions:** Only grant the permissions your project actually needs
+- **Fine-grained tokens preferred:** Use fine-grained tokens instead of classic tokens for better security
 
 ## 🖥️ VS Code / Cursor Remote Development
 
