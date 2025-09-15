@@ -99,7 +99,14 @@ if [ -n "$GITHUB_TOKEN" ]; then
     echo "export GH_PROMPT_DISABLED=1" >> /etc/environment
     echo "export GH_PROMPT_DISABLED=1" >> /home/${USERNAME}/.bashrc
 
-    echo "✅ GitHub CLI will use GH_TOKEN environment variable"
+    # Configure Git to use the token for HTTPS authentication
+    su - ${USERNAME} -c "git config --global credential.helper 'store --file=/workspace/credentials/git/.git-credentials'"
+    su - ${USERNAME} -c "mkdir -p /workspace/credentials/git"
+    echo "https://${GITHUB_TOKEN}@github.com" > /workspace/credentials/git/.git-credentials
+    chown ${USER_ID}:${GROUP_ID} /workspace/credentials/git/.git-credentials
+    chmod 600 /workspace/credentials/git/.git-credentials
+
+    echo "✅ GitHub CLI and Git configured with token authentication"
 fi
 
 # Set up persistent credential storage (must be done early)
